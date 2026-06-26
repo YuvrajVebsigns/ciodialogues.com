@@ -1,4 +1,4 @@
-import HeroSection from '@/components/HeroSection';
+// import HeroSection from '@/components/HeroSection';
 import FoundersMessage from '@/components/FoundersMessage';
 import ExpertiseSection from '@/components/ExpertiseSection';
 // import KeyClient from '@/components/KeyClient';
@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <main>
       {/* <div className="max-w-[1480px] mx-auto"> */}
-      <HeroSection />
+      {/* <HeroSection /> */}
       <FoundersMessage />
       <ExpertiseSection />
       {/* <TeamSection /> */}
