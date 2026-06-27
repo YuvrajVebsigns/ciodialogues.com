@@ -1,35 +1,33 @@
-// import HeroSection from '@/components/HeroSection';
+import React from 'react';
+import TrendingTicker from '@/components/TrendingTicker';
+import EditorialHeroGrid from '@/components/EditorialHeroGrid';
+import VideoDialoguesShowcase from '@/components/VideoDialoguesShowcase';
+import UpcomingEventsGrid from '@/components/UpcomingEventsGrid';
 import FoundersMessage from '@/components/FoundersMessage';
-import ExpertiseSection from '@/components/ExpertiseSection';
-// import KeyClient from '@/components/KeyClient';
-import ProjectsSection from '@/components/ProjectsSection';
-// import FAQSection from '@/components/FAQSection';
 import ContactSection from '@/components/ContactSection';
-import BlogsSection from '@/components/BlogsSection';
-// import DialoguesSection from '@/components/DialoguesSection';
-// import CIOPowerListProcess from '@/components/Process';
+import { MOCK_VIDEOS, MOCK_DIALOGUES } from '@/constants/mockData';
 
 export default function Home() {
   return (
-    <main>
-      {/* <div className="max-w-[1480px] mx-auto"> */}
-      {/* <HeroSection /> */}
+    <main className="bg-gray-50/50 min-h-screen pt-28">
+      {/* Auto-scrolling trending bar below the navbar */}
+
+      <TrendingTicker />
+
+      {/* Modern 3-Column newspaper editorial grid showing featured articles and newsletters */}
+      <EditorialHeroGrid />
+
+      {/* Split layout video showcase (left) paired with CIO dialogues grid (right) */}
+      <VideoDialoguesShowcase videos={MOCK_VIDEOS} dialogues={MOCK_DIALOGUES} />
+
+      {/* Showcase of upcoming ICT events and engagements */}
+      <UpcomingEventsGrid />
+
+      {/* Refined and modernized Founder's message */}
       <FoundersMessage />
-      <ExpertiseSection />
-      {/* <TeamSection /> */}
-      {/* <KeyClient /> */}
-      {/* <CIOPowerListProcess /> */}
-      <ProjectsSection />
-      {/* <ResearchSection />
-      <Brands /> */}
-      {/* <FAQSection /> */}
 
-      <BlogsSection />
-
-      {/* <DialoguesSection /> */}
+      {/* Quick connection / lead capture section */}
       <ContactSection />
-      {/* <AssociateBrandsPage /> */}
-      {/* </div> */}
     </main>
   );
 }

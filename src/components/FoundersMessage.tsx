@@ -1,310 +1,88 @@
-// 'use client';
-
-// import Image from 'next/image';
-// import Link from 'next/link';
-// import { ArrowUpRight } from 'lucide-react';
-// import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-
-// export default function FoundersMessage() {
-//   const sectionRef = useScrollAnimation<HTMLDivElement>({
-//     animationClass: 'animate-fade-in-up',
-//     initialTransform: 'translateY(60px)',
-//   });
-
-//   return (
-//     <section ref={sectionRef} className="founder-news-page">
-//       <div className="founder-news-paper">
-//         <div className="founder-news-topbar">
-//           <span>Founder&apos;s Desk</span>
-//           <span>CORE Media Editorial</span>
-//           <span>13+ Years of Impact</span>
-//         </div>
-
-//         <div className="founder-news-main-grid">
-//           <div className="founder-news-lead">
-//             <span className="founder-news-label">Editor&apos;s Note</span>
-
-//             <h2>
-//               Building Conversations
-//               <br />
-//               That Shape Industries
-//             </h2>
-
-//             <p>
-//               For over 13 years, CORE Media has connected technology leaders,
-//               innovators, and decision-makers through meaningful stories,
-//               insightful events, and trusted industry conversations.
-//             </p>
-
-//             <div className="founder-news-image">
-//               <Image
-//                 src="/assets/team/Anoop-Mathur.png"
-//                 alt="Anoop Mathur"
-//                 width={760}
-//                 height={520}
-//                 priority
-//               />
-//             </div>
-//           </div>
-
-//           <aside className="founder-news-sidebar">
-//             <h3>Latest Notes</h3>
-
-//             <ul>
-//               <li>Technology leadership in a changing world</li>
-//               <li>Building business communities through media</li>
-//               <li>The future of enterprise storytelling</li>
-//               <li>Creating impact through conversations</li>
-//               <li>Connecting leaders across industries</li>
-//             </ul>
-//           </aside>
-//         </div>
-
-//         <div className="founder-news-stats">
-//           <div>
-//             <strong>13+</strong>
-//             <span>Years</span>
-//           </div>
-
-//           <div>
-//             <strong>500+</strong>
-//             <span>Events</span>
-//           </div>
-
-//           <div>
-//             <strong>1000+</strong>
-//             <span>Leaders</span>
-//           </div>
-
-//           <div>
-//             <strong>50+</strong>
-//             <span>Cities</span>
-//           </div>
-//         </div>
-
-//         <div className="founder-news-columns">
-//           <article>
-//             <h4>Our Journey</h4>
-//             <p>
-//               What began as a vision to connect leaders has evolved into a
-//               trusted ecosystem for ideas, insights, and collaboration.
-//             </p>
-//           </article>
-
-//           <article>
-//             <h4>Our Mission</h4>
-//             <p>
-//               We create platforms where enterprise leaders exchange knowledge,
-//               build relationships, and discover meaningful opportunities.
-//             </p>
-//           </article>
-
-//           <article>
-//             <h4>Our Vision</h4>
-//             <p>
-//               To become the most trusted media and engagement platform for
-//               technology and business decision-makers.
-//             </p>
-//           </article>
-//         </div>
-
-//         <div className="founder-news-editorial">
-//           <p className="founder-news-dropcap">
-//             For more than thirteen years, CORE Media has remained committed to
-//             creating a platform where meaningful conversations inspire
-//             innovation, leadership, and business transformation.
-//           </p>
-
-//           <p>
-//             In an increasingly digital world, information travels faster than
-//             ever before. Yet what truly creates impact is not information
-//             itself, but the conversations that emerge from it.
-//           </p>
-
-//           <p>
-//             Every article we publish, every event we host, and every discussion
-//             we facilitate is designed to bring people together around the ideas
-//             shaping tomorrow.
-//           </p>
-
-//           <p>
-//             As we continue our journey, our commitment remains unchanged: to
-//             deliver trusted journalism, valuable insights, and powerful industry
-//             connections.
-//           </p>
-//         </div>
-
-//         <blockquote className="founder-news-quote">
-//           Every headline begins a conversation. Every conversation creates an
-//           opportunity.
-//         </blockquote>
-
-//         <div className="founder-news-footer">
-//           <div>
-//             <h3>Anoop Mathur</h3>
-//             <span>Founder &amp; Publisher</span>
-//           </div>
-
-//           <Link href="/#contact-section" className="founder-news-btn">
-//             Connect With Us
-//             <ArrowUpRight size={18} />
-//           </Link>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
-
 'use client';
 
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUpRight, CalendarDays, MapPin } from 'lucide-react';
-
-const sideStories = [
-  'India’s enterprise AI moment: From systematic adoption to scale',
-  'Quantum networks, not computers, may arrive first for enterprises',
-  'Cisco: The future of IT will run itself with AI-driven platforms',
-];
-
-const latestStories = [
-  'Tech leaders decode how data can power sustainable growth',
-  'AI startups pitch for enterprise-ready innovation',
-  'Cloud-first strategies reshape digital business models',
-  'Modern CIOs lead the next phase of enterprise transformation',
-];
-
-const eventCards = [
-  {
-    type: 'WEBINAR',
-    title: 'From Data-Rich to AI-Ready',
-    text: 'Indian enterprises have the scale, data, and infrastructure to support AI adoption.',
-    date: 'Wed, 24 Jun 2026',
-  },
-  {
-    type: 'EVENT',
-    title: 'The Executive Summit at Imagine',
-    text: 'Step inside the highest level of enterprise technology leadership.',
-    date: 'Thu, 02 Jul 2026',
-  },
-  {
-    type: 'EVENT',
-    title: 'Architecting the Intelligent Enterprise',
-    text: 'Deploying and supporting AI infrastructure is now a top priority.',
-    date: 'Fri, 03 Jul 2026',
-  },
-  {
-    type: 'EVENT',
-    title: 'Enterprise Dilemma',
-    text: 'As AI becomes central to enterprise innovation, leaders face new choices.',
-    date: 'Fri, 03 Jul 2026',
-  },
-];
+import { ArrowRight, Quote } from 'lucide-react';
 
 export default function FoundersMessage() {
   return (
-    <section className="founder-news-home">
-      <div className="founder-news-wrapper">
-        <div className="founder-news-grid">
-          <article className="founder-main-story">
-            <h2>The CORE Media Story: Conversations that power India’s technology leadership</h2>
+    <section className="w-full bg-[#fcf9f9] border-t border-gray-100 py-16 md:py-20 relative overflow-hidden">
+      {/* Background Accent Gradients */}
+      <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-red-500/5 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-red-500/5 blur-3xl pointer-events-none" />
 
-            <p>
-              CORE Media builds platforms where CIOs, CISOs, CTOs, business leaders and enterprise
-              technology brands exchange ideas that shape the future.
-            </p>
-
-            <div className="founder-main-image">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Left Column: Portrait & Stats (5 cols) */}
+          <div className="lg:col-span-5 flex justify-center relative">
+            {/* Portrait Card */}
+            <div className="relative w-full max-w-sm aspect-5/6 bg-white border border-gray-150 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <Image
                 src="/assets/team/Anoop-Mathur.png"
-                alt="Anoop Mathur"
-                width={520}
-                height={420}
+                alt="Anoop Mathur - Founder"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 40vw"
                 priority
+                unoptimized
               />
             </div>
-          </article>
 
-          <div className="founder-side-stories">
-            {sideStories.map((story, index) => (
-              <article key={story} className="founder-side-story">
-                <h3>{story}</h3>
-                <div className="founder-side-thumb">
-                  <Image
-                    src="/assets/team/Anoop-Mathur.png"
-                    alt="Founder"
-                    width={120}
-                    height={90}
-                  />
-                </div>
-                {index > 0 && <span>EXCLUSIVE</span>}
-              </article>
-            ))}
+            {/* Floating Badge */}
+            <div className="absolute -bottom-6 -right-2 md:right-8 bg-white border border-gray-100 p-4 rounded-xl shadow-lg max-w-[200px] hover:translate-y-[-2px] transition-transform">
+              <span className="block text-2xl font-black text-[#8e0101]">13+ Years</span>
+              <p className="text-xs text-gray-500 font-semibold mt-1 leading-relaxed">
+                Pioneering ICT Community & Media Innovation
+              </p>
+            </div>
           </div>
 
-          <aside className="founder-latest">
-            <div className="founder-tabs">
-              <button className="active">Latest</button>
-              <button>Most Read</button>
+          {/* Right Column: Message Contents (7 cols) */}
+          <div className="lg:col-span-7 flex flex-col justify-center space-y-6">
+            <div>
+              <span className="text-xs font-bold text-[#8e0101] uppercase tracking-widest bg-red-50 px-3 py-1 rounded-md">
+                Founder&apos;s Message
+              </span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-4 leading-tight">
+                Building Connections <br />
+                <span className="text-[#8e0101]">In A Digital-First World</span>
+              </h2>
             </div>
 
-            {latestStories.map((item) => (
-              <article key={item}>
-                <h4>{item}</h4>
-              </article>
-            ))}
-          </aside>
-        </div>
+            <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+              For over 13 years, CORE Media has pioneered innovation at the intersection of
+              technology, leadership, and community building. We establish bespoke, high-impact
+              channels that connect executive decision-makers, transform business structures, and
+              spark actionable industrial growth.
+            </p>
 
-        <div className="founder-view-more">
-          <Link href="/#contact-section">
-            View More <ArrowUpRight size={14} />
-          </Link>
-        </div>
+            {/* Quote block */}
+            <div className="bg-red-50/50 border-l-4 border-[#8e0101] p-5 rounded-r-xl relative">
+              <Quote className="absolute top-4 right-4 text-[#8e0101]/10 w-12 h-12 pointer-events-none" />
+              <p className="text-gray-700 font-medium italic text-sm md:text-base leading-relaxed relative">
+                &ldquo;We innovate to foster premium executive relationships that deliver
+                exceptional collaborative success, every single time.&rdquo;
+              </p>
+            </div>
 
-        <div className="founder-ad-row">
-          <div className="founder-ad-card cloud">
-            <h3>CORE Cloud Summit ’26</h3>
-            <p>Cloud 4.0: Intelligent, Secure & Sustainable Infrastructure</p>
-            <button>Express Interest</button>
-          </div>
+            {/* Author */}
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Anoop Mathur</h3>
+              <p className="text-xs text-gray-500 font-semibold">
+                Founder & Visionary Leader, CORE Media
+              </p>
+            </div>
 
-          <div className="founder-tools-card">
-            <h3>Tools & Solutions</h3>
-            <p>What to measure when evaluating enterprise technology partners.</p>
-            <Link href="#">View More →</Link>
-          </div>
-
-          <div className="founder-ad-card dark">
-            <h3>Workplace 2035</h3>
-            <p>Enterprise leadership for the next decade of work.</p>
-            <button>Know More</button>
-          </div>
-        </div>
-
-        <div className="founder-events-panel">
-          <h2>What’s happening in CORE Media</h2>
-
-          <div className="founder-event-grid">
-            {eventCards.map((event) => (
-              <article key={event.title} className="founder-event-card">
-                <span>{event.type}</span>
-                <h3>{event.title}</h3>
-                <p>{event.text}</p>
-
-                <div className="founder-event-meta">
-                  <CalendarDays size={14} />
-                  {event.date}
-                </div>
-
-                <div className="founder-event-meta">
-                  <MapPin size={14} />
-                  Mumbai, India
-                </div>
-
-                <Link href="#">Register Now ›</Link>
-              </article>
-            ))}
+            <div className="pt-2">
+              <Link
+                href="/#contact-section"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-[#8e0101] hover:bg-[#9d0101] text-white font-bold text-sm rounded-lg hover:shadow-md transition-all cursor-pointer"
+              >
+                <span>Partner With Us</span>
+                <ArrowRight size={16} />
+              </Link>
+            </div>
           </div>
         </div>
       </div>
