@@ -9,7 +9,7 @@ import { MOCK_VIDEOS, MOCK_DIALOGUES } from '@/constants/mockData';
 
 export default function Home() {
   return (
-    <main className="bg-gray-50/50 min-h-screen pt-28">
+    <main className="bg-gray-50/50 min-h-screen">
       {/* Auto-scrolling trending bar below the navbar */}
 
       <TrendingTicker />

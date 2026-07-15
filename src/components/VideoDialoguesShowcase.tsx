@@ -54,25 +54,23 @@ export default function VideoDialoguesShowcase({
   const videoCoverImage = '/assets/blogs/blog-1.webp';
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 py-12">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <section className="video-dialogues-showcase">
+      <div className="video-dialogues-showcase__grid">
         {/* Left Column: Interactive Video Corner (1/3 width) */}
-        <div className="lg:col-span-1 flex flex-col">
-          <div className="border-b border-gray-200 pb-2 mb-6">
-            <h3 className="text-lg font-extrabold text-gray-900 uppercase tracking-wider border-b-2 border-[#8e0101] inline-block pb-1">
-              Featured Video
-            </h3>
+        <div className="video-dialogues-showcase__featured-column">
+          <div className="video-dialogues-showcase__section-heading">
+            <h3 className="video-dialogues-showcase__section-title">Featured Video</h3>
           </div>
 
-          <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm flex flex-col flex-1">
-            <div className="relative aspect-video w-full bg-black overflow-hidden flex items-center justify-center group">
+          <div className="video-dialogues-showcase__featured-card">
+            <div className="video-dialogues-showcase__video-wrapper">
               {isPlaying ? (
                 <iframe
                   src={`${featuredVideo.videoUrl}?autoplay=1`}
                   title={featuredVideo.title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  className="absolute inset-0 w-full h-full border-0"
+                  className="video-dialogues-showcase__iframe"
                 />
               ) : (
                 <>
@@ -80,37 +78,35 @@ export default function VideoDialoguesShowcase({
                     src={videoCoverImage}
                     alt={featuredVideo.title}
                     fill
-                    className="object-cover opacity-85 group-hover:scale-102 transition-transform duration-500"
+                    className="video-dialogues-showcase__cover-image"
                     unoptimized
                   />
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
+                  <div className="video-dialogues-showcase__video-overlay" />
 
                   {/* Red Pulse Play Button */}
                   <button
                     type="button"
                     onClick={() => setIsPlaying(true)}
-                    className="absolute z-10 w-16 h-16 bg-[#8e0101] hover:bg-[#a30101] text-white rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110 cursor-pointer focus:outline-hidden"
+                    className="video-dialogues-showcase__play-button"
                     aria-label="Play video"
                   >
                     <Play size={26} fill="white" className="ml-1" />
-                    <span className="absolute -inset-2 bg-[#8e0101]/30 rounded-full animate-ping -z-10" />
+                    <span className="video-dialogues-showcase__play-pulse" />
                   </button>
                 </>
               )}
             </div>
 
-            <div className="p-5 flex-1 flex flex-col justify-between">
+            <div className="video-dialogues-showcase__featured-content">
               <div>
-                <span className="text-xs font-bold text-[#8e0101] uppercase tracking-wider bg-red-50 px-2 py-0.5 rounded">
+                <span className="video-dialogues-showcase__tag">
                   {featuredVideo.category || 'Reel'}
                 </span>
-                <h4 className="text-lg font-bold text-gray-900 mt-2 line-clamp-2 leading-snug">
-                  {featuredVideo.title}
-                </h4>
+                <h4 className="video-dialogues-showcase__featured-title">{featuredVideo.title}</h4>
               </div>
 
-              <div className="flex items-center justify-between text-xs text-gray-500 mt-4 border-t border-gray-100 pt-3">
-                <span className="flex items-center gap-1">
+              <div className="video-dialogues-showcase__meta-row">
+                <span className="video-dialogues-showcase__meta-item">
                   <User size={13} />
                   {featuredVideo.author || 'CORE Media'}
                 </span>
@@ -121,48 +117,42 @@ export default function VideoDialoguesShowcase({
         </div>
 
         {/* Right Column: Executive Dialogues 2x2 Grid (2/3 width) */}
-        <div className="lg:col-span-2 flex flex-col">
-          <div className="flex items-center justify-between border-b border-gray-200 pb-2 mb-6">
-            <h3 className="text-lg font-extrabold text-gray-900 uppercase tracking-wider border-b-2 border-[#8e0101] inline-block pb-1">
-              CIO Dialogues
-            </h3>
-            <Link
-              href="/dialoges"
-              className="inline-flex items-center gap-1 text-[#8e0101] text-xs font-bold hover:gap-1.5 transition-all"
-            >
+        <div className="video-dialogues-showcase__dialogues-column">
+          <div className="video-dialogues-showcase__dialogues-header">
+            <h3 className="video-dialogues-showcase__section-title">CIO Dialogues</h3>
+            <Link href="/dialoges" className="video-dialogues-showcase__view-all-link">
               <span>View All Dialogues</span>
               <ArrowUpRight size={14} />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+          <div className="video-dialogues-showcase__dialogues-grid">
             {displayDialogues.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between hover:border-red-100 hover:shadow-md transition-all group"
-              >
+              <div key={item.id} className="video-dialogues-showcase__dialogue-card">
                 <div className="relative">
-                  <div className="text-red-100 group-hover:text-red-200 transition-colors mb-3">
-                    <Quote size={28} fill="currentColor" className="opacity-40" />
+                  <div className="video-dialogues-showcase__quote-icon">
+                    <Quote
+                      size={28}
+                      fill="currentColor"
+                      className="video-dialogues-showcase__quote-icon-svg"
+                    />
                   </div>
-                  <p className="text-gray-700 text-sm italic line-clamp-4 leading-relaxed">
-                    &ldquo;{item.quote}&rdquo;
-                  </p>
+                  <p className="video-dialogues-showcase__quote-text">&ldquo;{item.quote}&rdquo;</p>
                 </div>
 
-                <div className="flex items-center gap-3 mt-4 border-t border-gray-50 pt-3.5">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden border border-red-50 bg-gray-50 shrink-0">
+                <div className="video-dialogues-showcase__dialogue-footer">
+                  <div className="video-dialogues-showcase__avatar-wrapper">
                     <Image
                       src={item.avatar}
                       alt={item.author}
                       fill
-                      className="object-cover"
+                      className="video-dialogues-showcase__avatar-image"
                       unoptimized
                     />
                   </div>
                   <div className="overflow-hidden">
-                    <h5 className="text-sm font-bold text-gray-900 truncate">{item.author}</h5>
-                    <p className="text-xs text-gray-500 truncate" title={item.role}>
+                    <h5 className="video-dialogues-showcase__dialogue-author">{item.author}</h5>
+                    <p className="video-dialogues-showcase__dialogue-role" title={item.role}>
                       {item.role}
                     </p>
                   </div>
@@ -171,8 +161,10 @@ export default function VideoDialoguesShowcase({
             ))}
 
             {displayDialogues.length === 0 && (
-              <div className="col-span-2 bg-white rounded-2xl border border-gray-100 p-8 text-center flex items-center justify-center">
-                <p className="text-gray-400 text-sm font-medium">No dialogues available.</p>
+              <div className="video-dialogues-showcase__no-dialogues-card">
+                <p className="video-dialogues-showcase__no-dialogues-text">
+                  No dialogues available.
+                </p>
               </div>
             )}
           </div>

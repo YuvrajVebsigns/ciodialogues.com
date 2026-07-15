@@ -18,18 +18,18 @@ export default function TrendingTicker() {
   const doubledItems = [...TICKER_ITEMS, ...TICKER_ITEMS];
 
   return (
-    <div className="w-full bg-white border-b border-gray-100 py-2.5 px-4 overflow-hidden relative flex items-center text-sm font-medium z-10 shadow-xs">
-      <div className="flex items-center gap-1.5 px-3 py-1 bg-[#8e0101] text-white text-xs font-bold uppercase tracking-wider rounded-md shrink-0 mr-4 z-20 shadow-xs">
+    <div className="w-full bg-white border-t border-b border-gray-100 -mt-px py-2.5 px-4 overflow-hidden relative flex items-center text-sm font-medium z-10 shadow-xs ">
+      <div className="flex items-center gap-1.5 px-3 py-1 bg-[#8e0101] text-white text-xs font-bold uppercase tracking-wider rounded-md shrink-0 mr-4 z-20 shadow-xs ">
         <Flame size={12} className="animate-pulse" />
         <span>Trending</span>
       </div>
 
-      <div className="relative w-full overflow-hidden flex items-center">
+      <div className="relative w-full overflow-hidden flex items-center ">
         <div className="flex gap-16 animate-marquee whitespace-nowrap">
           {doubledItems.map((item, index) => (
             <span
               key={index}
-              className="text-gray-700 hover:text-[#8e0101] transition-colors cursor-pointer flex items-center gap-2"
+              className="text-gray-700 hover:text-[#8e0101] transition-colors cursor-pointer flex items-center gap-2 "
             >
               <span className="inline-block w-1.5 h-1.5 bg-[#8e0101] rounded-full shrink-0" />
               {item}

@@ -2,7 +2,7 @@
 
 // import Link from 'next/link';
 // import Image from 'next/image';
-// import { Menu, X, ArrowUpRight } from 'lucide-react';
+// // import { Menu, X, Search } from 'lucide-react';
 // import { useEffect, useState } from 'react';
 // import { usePathname } from 'next/navigation';
 
@@ -21,123 +21,130 @@
 //   useEffect(() => {
 //     const handleScroll = () => {
 //       const currentScrollY = window.scrollY;
-
 //       setIsHidden(currentScrollY > lastScrollY && currentScrollY > 100);
 //       setLastScrollY(currentScrollY);
 //     };
 
 //     window.addEventListener('scroll', handleScroll, { passive: true });
-
-//     return () => {
-//       window.removeEventListener('scroll', handleScroll);
-//     };
+//     return () => window.removeEventListener('scroll', handleScroll);
 //   }, [lastScrollY]);
 
 //   return (
 //     <header
 //       className={`navbar ${isHidden ? 'navbar-hide' : ''} ${mobileOpen ? 'mobile-open' : ''}`}
 //     >
-//       <div className="navbar-container">
-//         <Link href="/" className="navbar-logo" onClick={closeAllMenus}>
-//           <Image src="/assets/logo/logo.webp" alt="CORE Media" width={190} height={150} priority />
-//         </Link>
+//       <div className="navbar-top">
+//         <div className="navbar-container">
+//           <Link href="/" className="navbar-logo" onClick={closeAllMenus}>
+//             <Image
+//               src="/assets/logo/logo.webp"
+//               alt="CORE Media"
+//               width={300}
+//               height={110}
+//               priority
+//             />
+//           </Link>
+
+//           <div className="navbar-ad">
+//             <span>Work without interruption</span>
+//           </div>
+//         </div>
 //       </div>
-//       <div>
-//         <nav className={`navbar-menu ${mobileOpen ? 'open' : ''}`}>
-//           <Link
-//             href="/cio-voice"
-//             className={`nav-link ${pathname === '/cio-voice' ? 'active' : ''}`}
-//             onClick={closeAllMenus}
-//           >
-//             CIO Voice
-//           </Link>
 
-//           <Link
-//             href="/thought-leadership"
-//             className={`nav-link ${pathname === '/thought-leadership' ? 'active' : ''}`}
-//             onClick={closeAllMenus}
-//           >
-//             Thought Leadership
-//           </Link>
+//       <div className="navbar-bottom">
+//         <div className="navbar-container navbar-row">
+//           <nav className={`navbar-menu ${mobileOpen ? 'open' : ''}`}>
+//             <Link
+//               href="/cio-voice"
+//               className={`nav-link ${pathname === '/cio-voice' ? 'active' : ''}`}
+//               onClick={closeAllMenus}
+//             >
+//               CIO Voice
+//             </Link>
 
-//           <Link
-//             href="/business-insights"
-//             className={`nav-link ${pathname === '/business-insights' ? 'active' : ''}`}
-//             onClick={closeAllMenus}
-//           >
-//             Business Insights
-//           </Link>
+//             <Link
+//               href="/thought-leadership"
+//               className={`nav-link ${pathname === '/thought-leadership' ? 'active' : ''}`}
+//               onClick={closeAllMenus}
+//             >
+//               Thought
+//             </Link>
 
-//           <Link
-//             href="/technology"
-//             className={`nav-link ${pathname === '/technology' ? 'active' : ''}`}
-//             onClick={closeAllMenus}
-//           >
-//             Technology
-//           </Link>
+//             <Link
+//               href="/business-insights"
+//               className={`nav-link ${pathname === '/business-insights' ? 'active' : ''}`}
+//               onClick={closeAllMenus}
+//             >
+//               Business Insights
+//             </Link>
 
-//           <Link
-//             href="/leadership-lessons"
-//             className={`nav-link ${pathname === '/leadership-lessons' ? 'active' : ''}`}
-//             onClick={closeAllMenus}
-//           >
-//             Leadership
-//           </Link>
+//             <Link
+//               href="/technology"
+//               className={`nav-link ${pathname === '/technology' ? 'active' : ''}`}
+//               onClick={closeAllMenus}
+//             >
+//               Technology
+//             </Link>
 
-//           <Link
-//             href="/leaderspeak"
-//             className={`nav-link ${pathname === '/leaderspeak' ? 'active' : ''}`}
-//             onClick={closeAllMenus}
-//           >
-//             Leader Speak
-//           </Link>
+//             <Link
+//               href="/leadership-lessons"
+//               className={`nav-link ${pathname === '/leadership-lessons' ? 'active' : ''}`}
+//               onClick={closeAllMenus}
+//             >
+//               Leadership
+//             </Link>
 
-//           <Link
-//             href="/events"
-//             className={`nav-link ${pathname === '/events' ? 'active' : ''}`}
-//             onClick={closeAllMenus}
-//           >
-//             Event
-//           </Link>
+//             <Link
+//               href="/leaderspeak"
+//               className={`nav-link ${pathname === '/leaderspeak' ? 'active' : ''}`}
+//               onClick={closeAllMenus}
+//             >
+//               Leader Speak
+//             </Link>
 
-//           <Link
-//             href="/blog"
-//             className={`nav-link ${pathname === '/blog' ? 'active' : ''}`}
-//             onClick={closeAllMenus}
-//           >
-//             Blog
-//           </Link>
+//             <Link
+//               href="/events"
+//               className={`nav-link ${pathname === '/events' ? 'active' : ''}`}
+//               onClick={closeAllMenus}
+//             >
+//               Event
+//             </Link>
 
-//           <Link
-//             href="/press-release"
-//             className={`nav-link ${pathname === '/press-release' ? 'active' : ''}`}
-//             onClick={closeAllMenus}
-//           >
-//             Press Release
-//           </Link>
-//         </nav>
+//             <Link
+//               href="/blog"
+//               className={`nav-link ${pathname === '/blog' ? 'active' : ''}`}
+//               onClick={closeAllMenus}
+//             >
+//               Blog
+//             </Link>
 
-//         <div className="navbar-actions">
-//           <Link href="/#contact-section" className="talk-btn" onClick={closeAllMenus}>
-//             <span>Let&apos;s Talk</span>
+//             <Link
+//               href="/press-release"
+//               className={`nav-link ${pathname === '/press-release' ? 'active' : ''}`}
+//               onClick={closeAllMenus}
+//             >
+//               Press Release
+//             </Link>
+//           </nav>
 
-//             <div className="talk-btn-icon">
-//               <ArrowUpRight size={18} />
-//             </div>
-//           </Link>
+//           <div className="navbar-actions">
+//             {/* <button type="button" className="search-btn" aria-label="Search">
+//               <Search size={30} />
+//             </button> */}
 
-//           <button
-//             type="button"
-//             className={`menu-btn ${mobileOpen ? 'open' : ''}`}
-//             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-//             aria-expanded={mobileOpen}
-//             onClick={() => {
-//               setMobileOpen((state) => !state);
-//               setIsHidden(false);
-//             }}
-//           >
-//             {mobileOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
-//           </button>
+//             {/* <button
+//               type="button"
+//               className={`menu-btn ${mobileOpen ? 'open' : ''}`}
+//               aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+//               aria-expanded={mobileOpen}
+//               onClick={() => {
+//                 setMobileOpen((state) => !state);
+//                 setIsHidden(false);
+//               }}
+//             >
+//               {mobileOpen ? <X size={34} /> : <Menu size={38} />}
+//             </button> */}
+//           </div>
 //         </div>
 //       </div>
 //     </header>
@@ -148,62 +155,93 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-// import { Menu, X, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+
+const AD_MESSAGES = [
+  'Where Technology Leaders Shape the Future',
+  'Insights That Empower CIOs',
+  'Lead Smarter. Innovate Faster.',
+  'The Voice of Digital Leadership',
+  'Driving Enterprise Innovation',
+];
 
 export default function Navbar() {
   const pathname = usePathname();
-
-  const [isHidden, setIsHidden] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const [adIndex, setAdIndex] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const closeAllMenus = () => {
-    setMobileOpen(false);
-    setIsHidden(false);
-  };
-
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setIsHidden(currentScrollY > lastScrollY && currentScrollY > 100);
-      setLastScrollY(currentScrollY);
-    };
+    const timer = window.setInterval(() => {
+      setAdIndex((current) => (current + 1) % AD_MESSAGES.length);
+    }, 2000);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+    return () => window.clearInterval(timer);
+  }, []);
 
   return (
-    <header
-      className={`navbar ${isHidden ? 'navbar-hide' : ''} ${mobileOpen ? 'mobile-open' : ''}`}
-    >
-      <div className="navbar-top">
+    <header className="navbar">
+      {/* Advertisement */}
+
+      {/* <div className="top-ad">
+        <div className="top-ad-inner">
+          <Image
+            src="/assets/ads/banner-3.png"
+            alt="Advertisement"
+            fill
+            sizes="100vw"
+            className="ad-image"
+            priority
+          />
+        </div>
+      </div> */}
+      {/* Logo */}
+
+      <div className="navbar-main">
         <div className="navbar-container">
-          <Link href="/" className="navbar-logo" onClick={closeAllMenus}>
-            <Image
-              src="/assets/logo/logo.webp"
-              alt="CORE Media"
-              width={300}
-              height={110}
-              priority
-            />
+          <Link href="/" className="navbar-logo">
+            <Image src="/assets/logo/logo.webp" alt="Core Media" width={220} height={70} priority />
           </Link>
 
-          <div className="navbar-ad">
-            <span>Work without interruption</span>
+          <div className="navbar-ad-inline" aria-label="Advertisement" aria-live="polite">
+            <span className="navbar-ad-heading">{AD_MESSAGES[adIndex]}</span>
+          </div>
+
+          <div className="navbar-right">
+            <button
+              type="button"
+              className="navbar-hamburger"
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileOpen}
+              onClick={() => setMobileOpen((current) => !current)}
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+
+            <Link href="/contact" className="btn-register">
+              Lets Talk
+            </Link>
+
+            {/* <Link href="/login" className="btn-login">
+              Sign In
+            </Link> */}
           </div>
         </div>
       </div>
 
-      <div className="navbar-bottom">
-        <div className="navbar-container navbar-row">
+      {/* Navigation */}
+
+      <div className="navbar-menu-wrapper">
+        <div className="navbar-container">
           <nav className={`navbar-menu ${mobileOpen ? 'open' : ''}`}>
+            <Link href="/" className={`nav-link ${pathname === '/' ? 'active' : ''}`}>
+              Home
+            </Link>
+
             <Link
               href="/cio-voice"
               className={`nav-link ${pathname === '/cio-voice' ? 'active' : ''}`}
-              onClick={closeAllMenus}
             >
               CIO Voice
             </Link>
@@ -211,15 +249,13 @@ export default function Navbar() {
             <Link
               href="/thought-leadership"
               className={`nav-link ${pathname === '/thought-leadership' ? 'active' : ''}`}
-              onClick={closeAllMenus}
             >
-              Thought
+              Thought Leadership
             </Link>
 
             <Link
               href="/business-insights"
               className={`nav-link ${pathname === '/business-insights' ? 'active' : ''}`}
-              onClick={closeAllMenus}
             >
               Business Insights
             </Link>
@@ -227,7 +263,6 @@ export default function Navbar() {
             <Link
               href="/technology"
               className={`nav-link ${pathname === '/technology' ? 'active' : ''}`}
-              onClick={closeAllMenus}
             >
               Technology
             </Link>
@@ -235,7 +270,6 @@ export default function Navbar() {
             <Link
               href="/leadership-lessons"
               className={`nav-link ${pathname === '/leadership-lessons' ? 'active' : ''}`}
-              onClick={closeAllMenus}
             >
               Leadership
             </Link>
@@ -243,54 +277,25 @@ export default function Navbar() {
             <Link
               href="/leaderspeak"
               className={`nav-link ${pathname === '/leaderspeak' ? 'active' : ''}`}
-              onClick={closeAllMenus}
             >
               Leader Speak
             </Link>
 
-            <Link
-              href="/events"
-              className={`nav-link ${pathname === '/events' ? 'active' : ''}`}
-              onClick={closeAllMenus}
-            >
-              Event
+            <Link href="/events" className={`nav-link ${pathname === '/events' ? 'active' : ''}`}>
+              Events
             </Link>
 
-            <Link
-              href="/blog"
-              className={`nav-link ${pathname === '/blog' ? 'active' : ''}`}
-              onClick={closeAllMenus}
-            >
+            <Link href="/blog" className={`nav-link ${pathname === '/blog' ? 'active' : ''}`}>
               Blog
             </Link>
 
             <Link
               href="/press-release"
               className={`nav-link ${pathname === '/press-release' ? 'active' : ''}`}
-              onClick={closeAllMenus}
             >
               Press Release
             </Link>
           </nav>
-
-          <div className="navbar-actions">
-            {/* <button type="button" className="search-btn" aria-label="Search">
-              <Search size={30} />
-            </button> */}
-
-            {/* <button
-              type="button"
-              className={`menu-btn ${mobileOpen ? 'open' : ''}`}
-              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={mobileOpen}
-              onClick={() => {
-                setMobileOpen((state) => !state);
-                setIsHidden(false);
-              }}
-            >
-              {mobileOpen ? <X size={34} /> : <Menu size={38} />}
-            </button> */}
-          </div>
         </div>
       </div>
     </header>
