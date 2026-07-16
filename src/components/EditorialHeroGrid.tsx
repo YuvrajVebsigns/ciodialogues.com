@@ -475,29 +475,30 @@ export default function EditorialHeroGrid() {
                 if (target) target.src = FALLBACK_EDITORIAL_IMAGE;
               }}
             />
-            {/* <span className="editorial-hero-grid__badge">
-              {getBlogCategory(featured)}
-            </span> */}
-          </div>
-          <div className="editorial-hero-grid__featured-content">
-            <div>
-              <div className="editorial-hero-grid__meta-row">
-                <span className="editorial-hero-grid__meta-item">
-                  <Calendar size={13} />
-                  {formatDate(featured.publishedAt)}
-                </span>
+
+            <div className="editorial-hero-grid__featured-overlay">
+              <div>
+                <div className="editorial-hero-grid__meta-row">
+                  <span className="editorial-hero-grid__meta-item">
+                    <Calendar size={13} />
+                    {formatDate(featured.publishedAt)}
+                  </span>
+                </div>
+
+                <h2 className="editorial-hero-grid__featured-title">
+                  <Link href={`/blog/${featured.slug}`}>{featured.title}</Link>
+                </h2>
+
+                <p className="editorial-hero-grid__featured-excerpt">
+                  {featured.excerpt || 'Read latest technology and leadership insights.'}
+                </p>
               </div>
-              <h2 className="editorial-hero-grid__featured-title">
-                <Link href={`/blog/${featured.slug}`}>{featured.title}</Link>
-              </h2>
-              <p className="editorial-hero-grid__featured-excerpt">
-                {featured.excerpt || 'Read latest technology and leadership insights.'}
-              </p>
+
+              <Link href={`/blog/${featured.slug}`} className="editorial-hero-grid__read-more">
+                Read Full Story
+                <ArrowRight size={16} />
+              </Link>
             </div>
-            <Link href={`/blog/${featured.slug}`} className="editorial-hero-grid__read-more">
-              Read Full Story
-              <ArrowRight size={16} />
-            </Link>
           </div>
         </article>
 

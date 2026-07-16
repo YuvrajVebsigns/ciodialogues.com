@@ -236,64 +236,64 @@ export default function Navbar() {
         <div className="navbar-container">
           <nav className={`navbar-menu ${mobileOpen ? 'open' : ''}`}>
             <Link href="/" className={`nav-link ${pathname === '/' ? 'active' : ''}`}>
-              Home
+              HOME
             </Link>
 
             <Link
               href="/cio-voice"
               className={`nav-link ${pathname === '/cio-voice' ? 'active' : ''}`}
             >
-              CIO Voice
+              CIO VOICE
             </Link>
 
             <Link
               href="/thought-leadership"
               className={`nav-link ${pathname === '/thought-leadership' ? 'active' : ''}`}
             >
-              Thought Leadership
+              THOUGHT LEADERSHIP
             </Link>
 
             <Link
               href="/business-insights"
               className={`nav-link ${pathname === '/business-insights' ? 'active' : ''}`}
             >
-              Business Insights
+              BUSINESS INSIGHTS
             </Link>
 
             <Link
               href="/technology"
               className={`nav-link ${pathname === '/technology' ? 'active' : ''}`}
             >
-              Technology
+              TECHNOLOGY
             </Link>
 
             <Link
               href="/leadership-lessons"
               className={`nav-link ${pathname === '/leadership-lessons' ? 'active' : ''}`}
             >
-              Leadership
+              LEADERSHIP
             </Link>
 
             <Link
               href="/leaderspeak"
               className={`nav-link ${pathname === '/leaderspeak' ? 'active' : ''}`}
             >
-              Leader Speak
+              LEADER SPEAK
             </Link>
 
             <Link href="/events" className={`nav-link ${pathname === '/events' ? 'active' : ''}`}>
-              Events
+              EVENTS
             </Link>
 
             <Link href="/blog" className={`nav-link ${pathname === '/blog' ? 'active' : ''}`}>
-              Blog
+              BLOG
             </Link>
 
             <Link
               href="/press-release"
               className={`nav-link ${pathname === '/press-release' ? 'active' : ''}`}
             >
-              Press Release
+              PRESS RELEASE
             </Link>
           </nav>
         </div>

@@ -4,6 +4,7 @@ import EditorialHeroGrid from '@/components/EditorialHeroGrid';
 import VideoDialoguesShowcase from '@/components/VideoDialoguesShowcase';
 import UpcomingEventsGrid from '@/components/UpcomingEventsGrid';
 import FoundersMessage from '@/components/FoundersMessage';
+import EditorialCategoryNavbar from '@/components/AllSection';
 import ContactSection from '@/components/ContactSection';
 import { MOCK_VIDEOS, MOCK_DIALOGUES } from '@/constants/mockData';
 
@@ -16,6 +17,8 @@ export default function Home() {
 
       {/* Modern 3-Column newspaper editorial grid showing featured articles and newsletters */}
       <EditorialHeroGrid />
+
+      <EditorialCategoryNavbar />
 
       {/* Split layout video showcase (left) paired with CIO dialogues grid (right) */}
       <VideoDialoguesShowcase videos={MOCK_VIDEOS} dialogues={MOCK_DIALOGUES} />
