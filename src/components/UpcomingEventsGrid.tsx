@@ -1,9 +1,230 @@
+// 'use client';
+
+// import { useEffect, useState } from 'react';
+// import Image from 'next/image';
+// import Link from 'next/link';
+// import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
+
+// import { fetchWebsiteEvents, type WebsiteEvent } from '@/services/events.service';
+
+// function getEventImage(item: WebsiteEvent): string {
+//   return String(item.image ?? item.heroImage ?? item.banner ?? '/assets/blogs/blog-1.webp');
+// }
+
+// function formatDate(date?: string): string {
+//   if (!date) return 'Upcoming';
+
+//   try {
+//     const parsedDate = /^\d{4}-\d{2}-\d{2}$/.test(date)
+//       ? new Date(`${date}T00:00:00`)
+//       : new Date(date);
+
+//     if (Number.isNaN(parsedDate.getTime())) {
+//       return 'Upcoming';
+//     }
+
+//     return parsedDate.toLocaleDateString('en-IN', {
+//       day: '2-digit',
+//       month: 'short',
+//       year: 'numeric',
+//     });
+//   } catch {
+//     return 'Upcoming';
+//   }
+// }
+
+// function createEventSlug(item: WebsiteEvent, title: string): string {
+//   if (item.slug) {
+//     return String(item.slug);
+//   }
+
+//   if (item.id) {
+//     return String(item.id);
+//   }
+
+//   return title
+//     .toLowerCase()
+//     .trim()
+//     .replace(/[^a-z0-9]+/g, '-')
+//     .replace(/^-+|-+$/g, '');
+// }
+
+// export default function UpcomingEventsGrid() {
+//   const [events, setEvents] = useState<WebsiteEvent[]>([]);
+//   const [isLoading, setIsLoading] = useState(true);
+
+//   useEffect(() => {
+//     let isMounted = true;
+
+//     async function loadEvents() {
+//       try {
+//         const data = await fetchWebsiteEvents();
+
+//         if (isMounted) {
+//           setEvents(Array.isArray(data) ? data : []);
+//         }
+//       } catch (error) {
+//         console.error('Unable to fetch website events:', error);
+
+//         if (isMounted) {
+//           setEvents([]);
+//         }
+//       } finally {
+//         if (isMounted) {
+//           setIsLoading(false);
+//         }
+//       }
+//     }
+
+//     void loadEvents();
+
+//     return () => {
+//       isMounted = false;
+//     };
+//   }, []);
+
+//   if (isLoading) {
+//     return (
+//       <section className="upcoming-events upcoming-events--loading">
+//         <div className="upcoming-events__container">
+//           <div className="upcoming-events__header">
+//             <div className="upcoming-events__loading-heading">
+//               <div className="upcoming-events__skeleton upcoming-events__skeleton--badge" />
+//               <div className="upcoming-events__skeleton upcoming-events__skeleton--title" />
+//             </div>
+
+//             <div className="upcoming-events__skeleton upcoming-events__skeleton--button" />
+//           </div>
+
+//           <div className="upcoming-events__grid">
+//             {[1, 2, 3].map((item) => (
+//               <div key={item} className="upcoming-events__skeleton-card" aria-hidden="true" />
+//             ))}
+//           </div>
+//         </div>
+//       </section>
+//     );
+//   }
+
+//   if (events.length === 0) {
+//     return null;
+//   }
+
+//   const displayEvents = events.slice(0, 3);
+
+//   return (
+//     <section className="upcoming-events">
+//       <div className="upcoming-events__container">
+//         <div className="upcoming-events__header">
+//           <div className="upcoming-events__heading">
+//             <span className="upcoming-events__badge">Custom Engagements</span>
+
+//             <h2 className="upcoming-events__title">
+//               Work <span className="upcoming-events__title-highlight">Highlights &amp; Events</span>
+//             </h2>
+//           </div>
+
+//           <Link href="/events" className="upcoming-events__view-all">
+//             <span>See All Events</span>
+//             <ArrowRight size={15} />
+//           </Link>
+//         </div>
+
+//         <div className="upcoming-events__grid">
+//           {displayEvents.map((item) => {
+//             const title = String(item.title ?? item.name ?? item.eventName ?? 'Event');
+
+//             const slug = createEventSlug(item, title);
+//             const imageSrc = getEventImage(item);
+
+//             const category = String(item.type ?? item.category ?? 'Conference');
+
+//             const date = formatDate(item.startDate ?? item.startsAt);
+
+//             const location = String(
+//               item.location ?? item.venue ?? item.city ?? 'Location to be announced',
+//             );
+
+//             const description = String(
+//               item.excerpt ??
+//                 item.description ??
+//                 'Join our exclusive networking and insights dialogue designed for enterprise executive decision-makers.',
+//             );
+
+//             const totalRegistrations =
+//               typeof item.totalRegistrations === 'number' ? item.totalRegistrations : 0;
+
+//             const eventHref = `/events/${slug}`;
+
+//             return (
+//               <article key={item.id || slug} className="upcoming-events__card">
+//                 <Link
+//                   href={eventHref}
+//                   className="upcoming-events__media"
+//                   aria-label={`View ${title}`}
+//                 >
+//                   <Image
+//                     src={imageSrc}
+//                     alt={title}
+//                     fill
+//                     className="upcoming-events__image"
+//                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+//                     unoptimized
+//                   />
+
+//                   <span className="upcoming-events__category">{category}</span>
+//                 </Link>
+
+//                 <div className="upcoming-events__content">
+//                   <div className="upcoming-events__content-top">
+//                     <div className="upcoming-events__meta">
+//                       <span className="upcoming-events__meta-item">
+//                         <Calendar size={13} />
+//                         {date}
+//                       </span>
+
+//                       {totalRegistrations > 0 && (
+//                         <span className="upcoming-events__meta-item">
+//                           <Users size={13} />
+//                           {totalRegistrations} Registered
+//                         </span>
+//                       )}
+//                     </div>
+
+//                     <h3 className="upcoming-events__card-title">
+//                       <Link href={eventHref}>{title}</Link>
+//                     </h3>
+
+//                     <p className="upcoming-events__description">{description}</p>
+//                   </div>
+
+//                   <div className="upcoming-events__footer">
+//                     <span className="upcoming-events__location">
+//                       <MapPin size={13} />
+//                       <span>{location}</span>
+//                     </span>
+
+//                     <Link href={eventHref} className="upcoming-events__join-link">
+//                       <span>Join Session</span>
+//                       <ArrowRight size={13} />
+//                     </Link>
+//                   </div>
+//                 </div>
+//               </article>
+//             );
+//           })}
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
+
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { Calendar, Users, MapPin, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
 import { fetchWebsiteEvents, type WebsiteEvent } from '@/services/events.service';
 
 function getEventImage(item: WebsiteEvent): string {
@@ -12,10 +233,17 @@ function getEventImage(item: WebsiteEvent): string {
 
 function formatDate(date?: string): string {
   if (!date) return 'Upcoming';
+
   try {
-    const d = new Date(date);
-    if (isNaN(d.getTime())) return 'Upcoming';
-    return d.toLocaleDateString('en-IN', {
+    const parsedDate = /^\d{4}-\d{2}-\d{2}$/.test(date)
+      ? new Date(`${date}T00:00:00`)
+      : new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return 'Upcoming';
+    }
+
+    return parsedDate.toLocaleDateString('en-IN', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -25,15 +253,33 @@ function formatDate(date?: string): string {
   }
 }
 
+function createEventSlug(item: WebsiteEvent, title: string): string {
+  if (item.slug) {
+    return String(item.slug);
+  }
+
+  if (item.id) {
+    return String(item.id);
+  }
+
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export default function UpcomingEventsGrid() {
   const [events, setEvents] = useState<WebsiteEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
+
     async function loadEvents() {
       try {
         const data = await fetchWebsiteEvents();
+
         if (isMounted) {
           setEvents(Array.isArray(data) ? data : []);
         }
@@ -47,7 +293,9 @@ export default function UpcomingEventsGrid() {
         }
       }
     }
-    loadEvents();
+
+    void loadEvents();
+
     return () => {
       isMounted = false;
     };
@@ -55,18 +303,26 @@ export default function UpcomingEventsGrid() {
 
   if (isLoading) {
     return (
-      <section className="w-full bg-[#fcf9f9] border-y border-gray-100 py-16 animate-pulse">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-end justify-between mb-10">
-            <div className="space-y-3">
-              <div className="h-5 w-28 bg-gray-200 rounded" />
-              <div className="h-8 w-64 bg-gray-200 rounded" />
+      <section className="upcoming-events upcoming-events--loading">
+        <div className="upcoming-events__container">
+          <div className="upcoming-events__header">
+            <div className="upcoming-events__loading-heading">
+              <div className="upcoming-events__skeleton upcoming-events__skeleton--badge" />
+
+              <div className="upcoming-events__skeleton upcoming-events__skeleton--title" />
             </div>
-            <div className="h-10 w-32 bg-gray-200 rounded" />
+
+            <div className="upcoming-events__skeleton upcoming-events__skeleton--button" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white h-[320px] rounded-2xl border border-gray-150" />
+
+          {/* <div className="upcoming-events__grid">
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="upcoming-events__skeleton-card" aria-hidden="true"/>
+            ))}
+          </div> */}
+          <div className="upcoming-events__grid">
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="upcoming-events__skeleton-card" aria-hidden="true" />
             ))}
           </div>
         </div>
@@ -74,7 +330,6 @@ export default function UpcomingEventsGrid() {
     );
   }
 
-  // Hide the entire section if no events are returned
   if (events.length === 0) {
     return null;
   }
@@ -82,95 +337,95 @@ export default function UpcomingEventsGrid() {
   const displayEvents = events.slice(0, 3);
 
   return (
-    <section className="w-full bg-[#fcf9f9] border-y border-gray-100 py-16">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="flex items-end justify-between mb-10">
-          <div>
-            <span className="text-xs font-bold text-[#8e0101] uppercase tracking-widest bg-red-50 px-3 py-1 rounded-md font-semibold">
-              Custom Engagements
-            </span>
-            <h2 className="text-3xl font-extrabold text-gray-900 mt-3 tracking-tight">
-              Work <span className="text-[#8e0101]">Highlights & Events</span>
+    <section className="upcoming-events">
+      <div className="upcoming-events__container">
+        <div className="upcoming-events__header">
+          <div className="upcoming-events__heading">
+            <span className="upcoming-events__badge">Custom Engagements</span>
+
+            <h2 className="upcoming-events__title">
+              Work <span className="upcoming-events__title-highlight">Highlights &amp; Events</span>
             </h2>
           </div>
-
-          <Link
-            href="/events"
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 font-bold text-sm rounded-lg hover:text-[#8e0101] hover:border-[#8e0101] hover:shadow-xs transition-all shrink-0 cursor-pointer"
-          >
+          <Link href="/events" className="upcoming-events__view-all">
             <span>See All Events</span>
             <ArrowRight size={15} />
           </Link>
         </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="upcoming-events__grid">
           {displayEvents.map((item) => {
             const title = String(item.title ?? item.name ?? item.eventName ?? 'Event');
-            const slug = String(item.slug ?? item.id ?? title.toLowerCase().replace(/\s+/g, '-'));
+
+            const slug = createEventSlug(item, title);
             const imageSrc = getEventImage(item);
             const category = String(item.type ?? item.category ?? 'Conference');
             const date = formatDate(item.startDate ?? item.startsAt);
+
+            const location = String(
+              item.location ?? item.venue ?? item.city ?? 'Location to be announced',
+            );
+
+            const description = String(
+              item.excerpt ??
+                item.description ??
+                'Join our exclusive networking and insights dialogue designed for enterprise executive decision-makers.',
+            );
+
             const totalRegistrations =
               typeof item.totalRegistrations === 'number' ? item.totalRegistrations : 0;
 
+            const eventHref = `/events/${slug}`;
+
             return (
-              <article
-                key={item.id || slug}
-                className="bg-white rounded-2xl overflow-hidden border border-gray-150 shadow-xs hover:shadow-md hover:border-red-100 transition-all flex flex-col group"
-              >
-                <div className="relative aspect-video w-full bg-gray-50 overflow-hidden">
+              <article key={item.id || slug} className="upcoming-events__card">
+                <Link
+                  href={eventHref}
+                  className="upcoming-events__media"
+                  aria-label={`View ${title}`}
+                >
                   <Image
                     src={imageSrc}
                     alt={title}
                     fill
-                    className="object-cover group-hover:scale-102 transition-transform duration-500"
+                    className="upcoming-events__image"
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     unoptimized
                   />
-                  <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded">
-                    {category}
-                  </div>
-                </div>
 
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-4 text-xs text-gray-500 font-medium">
-                      <span className="flex items-center gap-1.5">
-                        <Calendar size={13} className="text-gray-400" />
+                  <span className="upcoming-events__category">{category}</span>
+                </Link>
+
+                <div className="upcoming-events__content">
+                  <div className="upcoming-events__content-top">
+                    <div className="upcoming-events__meta">
+                      <span className="upcoming-events__meta-item">
+                        <Calendar size={13} />
                         {date}
                       </span>
+
                       {totalRegistrations > 0 && (
-                        <span className="flex items-center gap-1.5">
-                          <Users size={13} className="text-gray-400" />
+                        <span className="upcoming-events__meta-item">
+                          <Users size={13} />
                           {totalRegistrations} Registered
                         </span>
                       )}
                     </div>
 
-                    <h3 className="text-base font-bold text-gray-900 group-hover:text-[#8e0101] transition-colors line-clamp-2 leading-snug">
-                      <Link href={`/events/${slug}`}>{title}</Link>
+                    <h3 className="upcoming-events__card-title">
+                      <Link href={eventHref}>{title}</Link>
                     </h3>
 
-                    <p className="text-gray-600 text-xs line-clamp-2 leading-relaxed">
-                      {String(
-                        item.excerpt ??
-                          item.description ??
-                          'Join our exclusive networking and insights dialogue designed for enterprise executive decision-makers.',
-                      )}
-                    </p>
+                    <p className="upcoming-events__description">{description}</p>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-gray-50 pt-4 mt-5 text-xs text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <MapPin size={13} className="text-gray-400" />
-                      {category}
+                  <div className="upcoming-events__footer">
+                    <span className="upcoming-events__location">
+                      <MapPin size={13} />
+                      <span>{location}</span>
                     </span>
-                    <Link
-                      href={`/events/${slug}`}
-                      className="inline-flex items-center gap-1 text-[#8e0101] font-bold hover:gap-1.5 transition-all"
-                    >
+
+                    <Link href={eventHref} className="upcoming-events__join-link">
                       <span>Join Session</span>
                       <ArrowRight size={13} />
                     </Link>

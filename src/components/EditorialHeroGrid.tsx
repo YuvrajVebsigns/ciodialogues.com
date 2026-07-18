@@ -1,263 +1,3 @@
-// 'use client';
-
-// import React, { useEffect, useState } from 'react';
-// import Link from 'next/link';
-// import Image from 'next/image';
-// import { ArrowRight, Mail, Calendar, User, ArrowUpRight } from 'lucide-react';
-// import { fetchWebsiteBlogs, type WebsiteBlogItem } from '@/services/blogs.service';
-
-// function getBlogCategory(blog: WebsiteBlogItem) {
-//   return blog.websites?.[0]?.name || blog.tags?.[0] || 'Insight';
-// }
-
-// function getBlogImage(blog: WebsiteBlogItem) {
-//   return blog.featureImage || blog.seo?.ogImage || '/assets/blogs/blog-1.webp';
-// }
-
-// function formatDate(dateStr?: string) {
-//   if (!dateStr) return 'Recent';
-//   try {
-//     const d = new Date(dateStr);
-//     if (isNaN(d.getTime())) return 'Recent';
-//     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-//   } catch {
-//     return 'Recent';
-//   }
-// }
-
-// export default function EditorialHeroGrid() {
-//   const [blogs, setBlogs] = useState<WebsiteBlogItem[]>([]);
-//   const [isLoading, setIsLoading] = useState(true);
-
-//   useEffect(() => {
-//     let isMounted = true;
-//     async function loadBlogs() {
-//       try {
-//         const response = await fetchWebsiteBlogs(1, 4);
-//         if (isMounted) {
-//           setBlogs(response.data?.data || []);
-//         }
-//       } catch {
-//         if (isMounted) {
-//           setBlogs([]);
-//         }
-//       } finally {
-//         if (isMounted) {
-//           setIsLoading(false);
-//         }
-//       }
-//     }
-//     loadBlogs();
-//     return () => {
-//       isMounted = false;
-//     };
-//   }, []);
-
-//   if (isLoading) {
-//     return (
-//       <section className="editorial-hero-grid editorial-hero-grid--loading">
-//         <div className="editorial-hero-grid__grid editorial-hero-grid__grid--loading">
-//           {/* Skeleton Col 1 & 2 */}
-//           <div className="editorial-hero-grid__skeleton-image" />
-//           {/* Skeleton Col 3 */}
-//           <div className="editorial-hero-grid__skeleton-column">
-//             <div className="editorial-hero-grid__skeleton-heading" />
-//             {[1, 2, 3].map((i) => (
-//               <div key={i} className="editorial-hero-grid__skeleton-item">
-//                 <div className="editorial-hero-grid__skeleton-thumb" />
-//                 <div className="editorial-hero-grid__skeleton-lines">
-//                   <div className="editorial-hero-grid__skeleton-line editorial-hero-grid__skeleton-line--sm" />
-//                   <div className="editorial-hero-grid__skeleton-line editorial-hero-grid__skeleton-line--md" />
-//                   <div className="editorial-hero-grid__skeleton-line editorial-hero-grid__skeleton-line--sm-short" />
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//           {/* Skeleton Col 4 */}
-//           <div className="editorial-hero-grid__skeleton-sidebar">
-//             <div className="editorial-hero-grid__skeleton-panel editorial-hero-grid__skeleton-panel--large" />
-//             <div className="editorial-hero-grid__skeleton-panel editorial-hero-grid__skeleton-panel--small" />
-//           </div>
-//         </div>
-//       </section>
-//     );
-//   }
-
-//   if (blogs.length === 0) {
-//     return (
-//       <div className="editorial-hero-grid editorial-hero-grid__empty">
-//         <p>No featured stories found.</p>
-//       </div>
-//     );
-//   }
-
-//   const mainFeatured = blogs[0]!;
-//   const trendingBlogs = blogs.slice(1, 4);
-
-//   return (
-//     <section className="editorial-hero-grid">
-//       <div className="editorial-hero-grid__grid">
-//         {/* Column 1 & 2: Large Main Featured Story (50% width) */}
-//         <div className="editorial-hero-grid__featured-card">
-//           <div className="editorial-hero-grid__featured-media">
-//             <Image
-//               src={getBlogImage(mainFeatured)}
-//               alt={mainFeatured.title}
-//               fill
-//               className="editorial-hero-grid__featured-image"
-//               sizes="(max-width: 1024px) 100vw, 50vw"
-//               priority
-//               unoptimized
-//             />
-//             <div className="editorial-hero-grid__badge">
-//               {getBlogCategory(mainFeatured)}
-//             </div>
-//           </div>
-
-//           <div className="editorial-hero-grid__featured-content">
-//             <div>
-//               <div className="editorial-hero-grid__meta-row">
-//                 <span className="editorial-hero-grid__meta-item">
-//                   <Calendar size={13} />
-//                   {formatDate(mainFeatured.publishedAt)}
-//                 </span>
-//                 {mainFeatured.author?.fullName && (
-//                   <span className="editorial-hero-grid__meta-item">
-//                     <User size={13} />
-//                     {mainFeatured.author.fullName}
-//                   </span>
-//                 )}
-//               </div>
-
-//               <h2 className="editorial-hero-grid__featured-title">
-//                 <Link href={`/blog/${mainFeatured.slug}`}>{mainFeatured.title}</Link>
-//               </h2>
-
-//               <p className="editorial-hero-grid__featured-excerpt">
-//                 {mainFeatured.excerpt ||
-//                   'Read the latest thought leadership and digital transformation insights from technology leaders.'}
-//               </p>
-//             </div>
-
-//             <Link href={`/blog/${mainFeatured.slug}`} className="editorial-hero-grid__read-more">
-//               <span>Read Full Story</span>
-//               <ArrowRight size={16} />
-//             </Link>
-//           </div>
-//         </div>
-
-//         {/* Column 3: Trending Feed (25% width) */}
-//         <div className="editorial-hero-grid__trending-column">
-//           <div className="editorial-hero-grid__trending-heading-wrap">
-//             <h3 className="editorial-hero-grid__trending-heading">
-//               Latest Updates
-//             </h3>
-//           </div>
-
-//           {trendingBlogs.map((blog) => (
-//             <article
-//               key={blog.id}
-//               className="editorial-hero-grid__trending-item"
-//             >
-//               <div className="editorial-hero-grid__trending-thumb">
-//                 <Image
-//                   src={getBlogImage(blog)}
-//                   alt={blog.title}
-//                   fill
-//                   className="editorial-hero-grid__trending-image"
-//                   sizes="80px"
-//                   unoptimized
-//                 />
-//               </div>
-
-//               <div className="editorial-hero-grid__trending-content">
-//                 <div>
-//                   <span className="editorial-hero-grid__trending-category">
-//                     {getBlogCategory(blog)}
-//                   </span>
-//                   <h4 className="editorial-hero-grid__trending-title">
-//                     <Link href={`/blog/${blog.slug}`}>{blog.title}</Link>
-//                   </h4>
-//                 </div>
-//                 <span className="editorial-hero-grid__trending-date">
-//                   {formatDate(blog.publishedAt)}
-//                 </span>
-//               </div>
-//             </article>
-//           ))}
-
-//           {trendingBlogs.length === 0 && (
-//             <p className="editorial-hero-grid__trending-empty">No recent updates found.</p>
-//           )}
-//         </div>
-
-//         {/* Column 4: Newsletter & Quick Links (25% width) */}
-//         <div className="editorial-hero-grid__sidebar">
-//           {/* Newsletter Box */}
-//           <div className="editorial-hero-grid__newsletter">
-//             {/* Background design accents */}
-//             <div className="editorial-hero-grid__newsletter-accent" />
-
-//             <div className="editorial-hero-grid__newsletter-body">
-//               <div className="editorial-hero-grid__newsletter-icon">
-//                 <Mail size={20} className="editorial-hero-grid__newsletter-icon-svg" />
-//               </div>
-//               <h3 className="editorial-hero-grid__newsletter-title">Subscribe to Insights</h3>
-//               <p className="editorial-hero-grid__newsletter-text">
-//                 Stay updated with the latest CIO dialogues, event updates, and technology insights
-//                 directly in your inbox.
-//               </p>
-//             </div>
-
-//             <form onSubmit={(e) => e.preventDefault()} className="editorial-hero-grid__newsletter-form">
-//               <input
-//                 type="email"
-//                 placeholder="Enter email address"
-//                 required
-//                 className="editorial-hero-grid__newsletter-input"
-//               />
-//               <button
-//                 type="submit"
-//                 className="editorial-hero-grid__newsletter-button"
-//               >
-//                 Join Now
-//               </button>
-//             </form>
-//           </div>
-
-//           {/* Quick Access Card */}
-//           <div className="editorial-hero-grid__channels">
-//             <h4 className="editorial-hero-grid__channels-label">
-//               Explore Channels
-//             </h4>
-//             <div className="editorial-hero-grid__channels-list">
-//               {[
-//                 { label: 'CIO Voice', href: '/cio-voice' },
-//                 { label: 'Thought Leadership', href: '/thought-leadership' },
-//                 { label: 'Business Insights', href: '/business-insights' },
-//                 { label: 'Technology Solutions', href: '/technology' },
-//                 { label: 'Leadership Lessons', href: '/leadership-lessons' },
-//               ].map((channel, idx) => (
-//                 <Link
-//                   key={idx}
-//                   href={channel.href}
-//                   className="editorial-hero-grid__channel-link"
-//                 >
-//                   <span>{channel.label}</span>
-//                   <ArrowUpRight
-//                     size={14}
-//                     className="editorial-hero-grid__channel-icon"
-//                   />
-//                 </Link>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -271,6 +11,29 @@ import {
   getPageTestimonials,
   type PageTestimonial,
 } from '@/services/pages.service';
+
+const channels = [
+  {
+    label: 'CIO Voice',
+    href: '/cio-voice',
+  },
+  {
+    label: 'Thought Leadership',
+    href: '/thought-leadership',
+  },
+  {
+    label: 'Business Insights',
+    href: '/business-insights',
+  },
+  {
+    label: 'Technology Solutions',
+    href: '/category/technology-solutions',
+  },
+  {
+    label: 'Leadership Lessons',
+    href: '/leadership-lessons',
+  },
+];
 
 const FALLBACK_EDITORIAL_IMAGE = '/assets/blogs/blog-1.webp';
 const MAX_THOUGHT_ITEMS = 1;
@@ -586,7 +349,7 @@ export default function EditorialHeroGrid() {
               </article>
             ) : null}
           </div>
-          <div className="editorial-hero-grid__channels">
+          {/* <div className="editorial-hero-grid__channels">
             <h4 className="editorial-hero-grid__channels-label">Explore Channels</h4>
             <div className="editorial-hero-grid__channels-list">
               {[
@@ -598,6 +361,23 @@ export default function EditorialHeroGrid() {
               ].map((item) => (
                 <Link key={item} href="#" className="editorial-hero-grid__channel-link">
                   {item}
+                  <ArrowUpRight size={14} />
+                </Link>
+              ))}
+            </div>
+          </div> */}
+
+          <div className="editorial-hero-grid__channels">
+            <h4 className="editorial-hero-grid__channels-label">Explore Channels</h4>
+
+            <div className="editorial-hero-grid__channels-list">
+              {channels.map((channel) => (
+                <Link
+                  key={channel.label}
+                  href={channel.href}
+                  className="editorial-hero-grid__channel-link"
+                >
+                  {channel.label}
                   <ArrowUpRight size={14} />
                 </Link>
               ))}

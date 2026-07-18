@@ -7,7 +7,7 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn, FaXTwitter } from 'react-icons/
 
 const quickLinks = [
   { label: 'Home', href: '/' },
-  { label: 'CIO', href: '/cio-voice' },
+  { label: 'CIO Voice', href: '/cio-voice' },
   { label: 'Thought', href: '/thought-leadership' },
   { label: 'Business Insights', href: '/business-insights' },
   { label: 'Technology', href: '/technology' },
@@ -60,19 +60,19 @@ export default function Footer() {
               <h4 className="footer-title">Services</h4>
 
               <ul className="footer-links">
-                <li>
+                {/* <li>
                   <Link href="/register">
                     Registration
-                    {/* <ArrowUpRight size={13} /> */}
+                   
                   </Link>
                 </li>
 
                 <li>
                   <Link href="/nominate">
                     Nominate
-                    {/* <ArrowUpRight size={13} /> */}
+                   
                   </Link>
-                </li>
+                </li> */}
 
                 <li>
                   <Link href="/events">

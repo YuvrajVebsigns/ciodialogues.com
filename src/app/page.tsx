@@ -20,11 +20,11 @@ export default function Home() {
 
       <EditorialCategoryNavbar />
 
-      {/* Split layout video showcase (left) paired with CIO dialogues grid (right) */}
-      <VideoDialoguesShowcase videos={MOCK_VIDEOS} dialogues={MOCK_DIALOGUES} />
-
       {/* Showcase of upcoming ICT events and engagements */}
       <UpcomingEventsGrid />
+
+      {/* Split layout video showcase (left) paired with CIO dialogues grid (right) */}
+      <VideoDialoguesShowcase videos={MOCK_VIDEOS} dialogues={MOCK_DIALOGUES} />
 
       {/* Refined and modernized Founder's message */}
       <FoundersMessage />
