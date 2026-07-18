@@ -281,14 +281,19 @@ const recentPosts = [
 ];
 
 const sections = [
-  'CIO VOICE',
-  'BUSINESS INSIGHTS',
-  'TECHNOLOGY',
-  'LEADERSHIP LESSONS',
-  'EVENTS',
-  'BESPOKE',
-  'CIO TRANSITIONS',
-  'LEADER TRANSITIONS',
+  { label: 'CIO VOICE', href: '/cio-voice' },
+  { label: 'THOUGHT LEADERSHIP', href: '/thought-leadership' },
+  { label: 'BUSINESS INSIGHTS', href: '/business-insights' },
+  { label: 'TECHNOLOGY', href: '/technology' },
+  { label: 'LEADERSHIP LESSONS', href: '/leadership-lessons' },
+  { label: 'LEADER SPEAK', href: '/leaderspeak' },
+  { label: 'EVENTS', href: '/events' },
+  { label: 'BESPOKE', href: '/bespoke' },
+  { label: 'PRESS RELEASE', href: '/press-release' },
+  { label: 'CIO TRANSITIONS', href: '/cio-transitions' },
+  { label: 'LEADER TRANSITIONS', href: '/leader-transitions' },
+  { label: 'MAIN STORY', href: '/main-story' },
+  { label: 'OUR BRAND', href: '/our-brand' },
 ];
 
 const leftColumnStories = [
@@ -391,7 +396,7 @@ function mapTestimonialsToPosts(testimonials: PageTestimonial[]): Post[] {
 export default function ThoughtLeadershipPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [search] = useState('');
-  const [activeSection, setActiveSection] = useState('THOUGHT LEADERSHIP');
+  const [activeSection] = useState('THOUGHT LEADERSHIP');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -529,6 +534,23 @@ export default function ThoughtLeadershipPage() {
               <span>Thought Leadership</span>
               <h3>{leadPost.title}</h3>
             </Link>
+            <section className="news-editorial-sidebar-links">
+              <div className="news-editorial-section-heading">
+                <span />
+                <h2>Sections</h2>
+                <span />
+              </div>
+
+              <ul>
+                {sections.map((item) => (
+                  <li key={item.label}>
+                    <Link href={item.href} className={activeSection === item.label ? 'active' : ''}>
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
           </aside>
 
           <section className="news-editorial-main">
@@ -691,28 +713,6 @@ export default function ThoughtLeadershipPage() {
                 {recentPosts.map((item) => (
                   <li key={item}>
                     <Link href="#">{item}</Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            <section className="news-editorial-sidebar-links">
-              <div className="news-editorial-section-heading">
-                <span />
-                <h2>Sections</h2>
-                <span />
-              </div>
-
-              <ul>
-                {sections.map((item) => (
-                  <li key={item}>
-                    <button
-                      type="button"
-                      className={activeSection === item ? 'active' : ''}
-                      onClick={() => setActiveSection(item)}
-                    >
-                      {item}
-                    </button>
                   </li>
                 ))}
               </ul>

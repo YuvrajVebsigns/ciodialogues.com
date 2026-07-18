@@ -299,12 +299,10 @@
 //     </main>
 //   );
 // }
-
 'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
-// import { Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import {
   fetchWebsitePageBySlug,
@@ -326,86 +324,7 @@ type CIOPost = {
 
 const fallbackImage = '/assets/blogs/blog-1.webp';
 
-const staticPosts: CIOPost[] = [
-  // {
-  //   id: 'static-1',
-  //   title: 'Building Autonomous Financial Copilots That Think Ahead',
-  //   author: 'CIO Dialogues Team',
-  //   date: 'January 5, 2026',
-  //   image: fallbackImage,
-  //   excerpt:
-  //     'Vamsi Ithamraju is the Chief Technology Officer at Axis Mutual Fund. He has over two decades of experience at the inflection of consulting and technology.',
-  //   content:
-  //     'Vamsi Ithamraju is the Chief Technology Officer at Axis Mutual Fund. He has over two decades of experience at the inflection of consulting and technology. In this exclusive CIO Voice interview, Vamsi shares insights on building autonomous financial systems, the intersection of AI and fintech, and how enterprise leaders can drive digital transformation in the financial services industry.',
-  //   slug: 'building-autonomous-financial-copilots-that-think-ahead',
-  //   category: 'CIO VOICE',
-  // },
-  // {
-  //   id: 'static-2',
-  //   title: 'Driving a Digital-First Mindset Through Iterative Delivery',
-  //   author: 'CIO Dialogues Team',
-  //   date: 'November 4, 2025',
-  //   image: '/assets/blogs/blog-2.webp',
-  //   excerpt:
-  //     'Arpanarghya Saha shares his perspective on digital-first delivery, business agility, and enterprise transformation.',
-  //   content:
-  //     'Arpanarghya Saha shares his perspective on digital-first delivery, business agility, and enterprise transformation. Learn how enterprise leaders can adopt iterative delivery practices to accelerate innovation and respond to market changes faster than ever before.',
-  //   slug: 'driving-a-digital-first-mindset-through-iterative-delivery',
-  //   category: 'LEADERSHIP LESSONS',
-  // },
-  // {
-  //   id: 'static-3',
-  //   title: 'How Enterprise Leaders Are Preparing for the Agentic AI Era',
-  //   author: 'Technology Desk',
-  //   date: 'October 20, 2025',
-  //   image: '/assets/blogs/blog-3.webp',
-  //   excerpt:
-  //     'Technology leaders are redesigning operating models, governance frameworks, and digital infrastructure for the next generation of artificial intelligence.',
-  //   content:
-  //     'Technology leaders are redesigning operating models, governance frameworks, and digital infrastructure for the next generation of artificial intelligence.',
-  //   slug: 'enterprise-leaders-preparing-for-agentic-ai',
-  //   category: 'TECHNOLOGY',
-  // },
-  // {
-  //   id: 'static-4',
-  //   title: 'Cloud Modernisation Becomes a Boardroom Priority',
-  //   author: 'CIO Dialogues Team',
-  //   date: 'September 18, 2025',
-  //   image: '/assets/blogs/blog-4.webp',
-  //   excerpt:
-  //     'Modern cloud platforms are helping businesses improve resilience, scalability, operational agility, and customer experience.',
-  //   content:
-  //     'Modern cloud platforms are helping businesses improve resilience, scalability, operational agility, and customer experience.',
-  //   slug: 'cloud-modernisation-boardroom-priority',
-  //   category: 'BUSINESS INSIGHTS',
-  // },
-  // {
-  //   id: 'static-5',
-  //   title: 'Cybersecurity Leaders Focus on Identity-First Protection',
-  //   author: 'Technology Desk',
-  //   date: 'August 14, 2025',
-  //   image: '/assets/blogs/blog-5.webp',
-  //   excerpt:
-  //     'Identity security and zero-trust architecture are becoming central to enterprise protection strategies.',
-  //   content:
-  //     'Identity security and zero-trust architecture are becoming central to enterprise protection strategies.',
-  //   slug: 'identity-first-cybersecurity-protection',
-  //   category: 'TECHNOLOGY',
-  // },
-  // {
-  //   id: 'static-6',
-  //   title: 'Data Governance Moves From Compliance to Business Value',
-  //   author: 'Editorial Bureau',
-  //   date: 'July 28, 2025',
-  //   image: '/assets/blogs/blog-6.webp',
-  //   excerpt:
-  //     'Organisations are turning trusted and governed data into a foundation for innovation and enterprise AI adoption.',
-  //   content:
-  //     'Organisations are turning trusted and governed data into a foundation for innovation and enterprise AI adoption.',
-  //   slug: 'data-governance-business-value',
-  //   category: 'BUSINESS INSIGHTS',
-  // },
-];
+const staticPosts: CIOPost[] = [];
 
 const leftColumnStories = [
   {
@@ -444,17 +363,21 @@ const popularStories = [
   },
 ];
 
-// const sections = [
-//   'ALL',
-//   'CIO VOICE',
-//   'BUSINESS INSIGHTS',
-//   'TECHNOLOGY',
-//   'LEADERSHIP LESSONS',
-//   'EVENTS',
-//   'BESPOKE',
-//   'CIO TRANSITIONS',
-//   'LEADER TRANSITIONS',
-// ];
+const sections = [
+  { label: 'CIO VOICE', href: '/cio-voice' },
+  { label: 'THOUGHT LEADERSHIP', href: '/thought-leadership' },
+  { label: 'BUSINESS INSIGHTS', href: '/business-insights' },
+  { label: 'TECHNOLOGY', href: '/technology' },
+  { label: 'LEADERSHIP LESSONS', href: '/leadership-lessons' },
+  { label: 'LEADER SPEAK', href: '/leaderspeak' },
+  { label: 'EVENTS', href: '/events' },
+  { label: 'BESPOKE', href: '/bespoke' },
+  { label: 'PRESS RELEASE', href: '/press-release' },
+  { label: 'CIO TRANSITIONS', href: '/cio-transitions' },
+  { label: 'LEADER TRANSITIONS', href: '/leader-transitions' },
+  { label: 'MAIN STORY', href: '/main-story' },
+  { label: 'OUR BRAND', href: '/our-brand' },
+];
 
 function cleanText(text: string, limit = 230) {
   const value = text.replace(/\s+/g, ' ').trim();
@@ -572,41 +495,6 @@ export default function CIOVoicePage() {
 
   return (
     <main className="news-editorial-page">
-      {/* <header className="news-editorial-header">
-        <Link href="/" className="news-editorial-brand">
-          <span>CIO</span>
-          <strong>Dialogues</strong>
-        </Link>
-
-        <nav
-          className="news-editorial-nav"
-          aria-label="CIO Voice sections"
-        >
-          {sections.map((section) => (
-            <button
-              key={section}
-              type="button"
-              className={activeSection === section ? 'active' : ''}
-              onClick={() => setActiveSection(section)}
-            >
-              {section}
-            </button>
-          ))}
-        </nav>
-
-        <label className="news-editorial-search">
-          <Search size={17} />
-
-          <input
-            type="search"
-            value={search}
-            placeholder="Search stories"
-            aria-label="Search stories"
-            onChange={(event) => setSearch(event.target.value)}
-          />
-        </label>
-      </header> */}
-
       {isLoading ? (
         <section className="news-editorial-status">
           <h2>Loading stories...</h2>
@@ -615,7 +503,7 @@ export default function CIOVoicePage() {
       ) : !leadPost ? (
         <section className="news-editorial-status">
           <h2>No stories found</h2>
-          <p>Try another search keyword or select a different section.</p>
+          <p>Try selecting another section.</p>
         </section>
       ) : (
         <div className="news-editorial-layout">
@@ -623,9 +511,7 @@ export default function CIOVoicePage() {
             {leftColumnStories.map((story) => (
               <article key={story.title} className="news-editorial-rail-story">
                 <span>{story.category}</span>
-
                 <h3>{story.title}</h3>
-
                 <small>{story.author}</small>
               </article>
             ))}
@@ -642,9 +528,25 @@ export default function CIOVoicePage() {
               </div>
 
               <span>{leadPost.category}</span>
-
               <h3>{leadPost.title}</h3>
             </Link>
+            <section className="news-editorial-sidebar-links">
+              <div className="news-editorial-section-heading">
+                <span />
+                <h2>Sections</h2>
+                <span />
+              </div>
+
+              <ul>
+                {sections.map((item) => (
+                  <li key={item.label}>
+                    <Link href={item.href} className={activeSection === item.label ? 'active' : ''}>
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
           </aside>
 
           <section className="news-editorial-main">
@@ -764,7 +666,7 @@ export default function CIOVoicePage() {
                   leadership.
                 </p>
 
-                <Link href="/cio-voice">Explore now</Link>
+                {/* <Link href="/cio-voice">Explore now</Link> */}
               </div>
             </section>
 
@@ -786,7 +688,6 @@ export default function CIOVoicePage() {
 
                     <div>
                       <span>{String(index + 1).padStart(2, '0')}</span>
-
                       <h3>{story.title}</h3>
                     </div>
                   </article>
