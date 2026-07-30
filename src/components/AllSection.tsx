@@ -12,6 +12,14 @@ import {
 
 const FALLBACK_IMAGE = '/assets/blogs/blog-1.webp';
 
+const SECTION_IMAGES: Record<string, string> = {
+  'CIO Voice': '/assets/editorial/cio-voice.jpg',
+  'Leadership Lessons': '/assets/editorial/leadership-lessons.webp',
+  Technology: '/assets/editorial/technology.webp',
+  'Thought Leadership': '/assets/editorial/thought-leadership.webp',
+  'Business Insights': '/assets/editorial/business-insights.webp',
+};
+
 type EditorialPagePost = {
   id: string;
   title: string;
@@ -44,21 +52,38 @@ function cleanText(value: string, limit = 170) {
   return text.length > limit ? `${text.slice(0, limit).trim()}...` : text;
 }
 
-function getValidImage(value?: string) {
-  if (!value) return FALLBACK_IMAGE;
+// function getValidImage(value?: string) {
+//   if (!value) return FALLBACK_IMAGE;
+
+//   const image = value.trim();
+//   const normalizedImage = image.toLowerCase();
+
+//   if (!image || normalizedImage === 'null' || normalizedImage === 'undefined') {
+//     return FALLBACK_IMAGE;
+//   }
+
+//   if (image.startsWith('/') || image.startsWith('http://') || image.startsWith('https://')) {
+//     return image;
+//   }
+
+//   return FALLBACK_IMAGE;
+// }
+
+function getValidImage(value?: string, sectionImage = FALLBACK_IMAGE) {
+  if (!value) return sectionImage;
 
   const image = value.trim();
   const normalizedImage = image.toLowerCase();
 
   if (!image || normalizedImage === 'null' || normalizedImage === 'undefined') {
-    return FALLBACK_IMAGE;
+    return sectionImage;
   }
 
   if (image.startsWith('/') || image.startsWith('http://') || image.startsWith('https://')) {
     return image;
   }
 
-  return FALLBACK_IMAGE;
+  return sectionImage;
 }
 
 function getRoleMeta(role?: string) {
@@ -89,7 +114,9 @@ function mapTestimonialsToPagePosts(
         title,
         author: meta.author,
         date: meta.date,
-        image: getValidImage(item.avatar),
+        // image: getValidImage(item.avatar),
+        image: getValidImage(item.avatar, SECTION_IMAGES[fallbackTitle] || FALLBACK_IMAGE),
+
         excerpt: cleanText(item.quote || fallbackExcerpt),
         slug: generateSlug(title),
       };

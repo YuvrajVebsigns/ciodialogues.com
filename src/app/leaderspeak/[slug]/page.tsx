@@ -5,6 +5,7 @@
 // import { ArrowLeft, Calendar, User } from 'lucide-react';
 // import { useEffect, useState } from 'react';
 // import { useParams } from 'next/navigation';
+
 // import {
 //   fetchWebsitePageBySlug,
 //   getPageTestimonials,
@@ -25,11 +26,12 @@
 //   return text
 //     .toLowerCase()
 //     .trim()
-//     .replace(/[“”‘’]/g, '')
+//     .replace(/[“”‘’']/g, '')
 //     .replace(/&/g, 'and')
 //     .replace(/[^\w\s-]/g, '')
 //     .replace(/\s+/g, '-')
-//     .replace(/-+/g, '-');
+//     .replace(/-+/g, '-')
+//     .slice(0, 100);
 // }
 
 // function getRoleMeta(role = '') {
@@ -70,7 +72,7 @@
 
 // export default function LeaderSpeakDetailPage() {
 //   const params = useParams<{ slug: string }>();
-//   const slug = params.slug;
+//   const slug = decodeURIComponent(params.slug);
 
 //   const [post, setPost] = useState<PostDetail | null>(null);
 //   const [isLoading, setIsLoading] = useState(true);
@@ -83,15 +85,34 @@
 //         const response = await fetchWebsitePageBySlug('leaderspeak');
 //         const testimonials = getPageTestimonials(response.data);
 
+//         console.log('URL Slug:', slug);
+//         console.log('Testimonials:', testimonials);
+
 //         const found = testimonials.find((item: PageTestimonial) => {
-//           return generateSlug(item.author || 'LeaderSpeak') === slug;
+//           const itemSlug = generateSlug(item.author || 'LeaderSpeak');
+
+//           console.log({
+//             author: item.author,
+//             itemSlug,
+//             urlSlug: slug,
+//           });
+
+//           return itemSlug === slug;
 //         });
 
-//         if (isMounted) setPost(found ? testimonialToPost(found) : null);
-//       } catch {
-//         if (isMounted) setPost(null);
+//         if (isMounted) {
+//           setPost(found ? testimonialToPost(found) : null);
+//         }
+//       } catch (error) {
+//         console.error(error);
+
+//         if (isMounted) {
+//           setPost(null);
+//         }
 //       } finally {
-//         if (isMounted) setIsLoading(false);
+//         if (isMounted) {
+//           setIsLoading(false);
+//         }
 //       }
 //     }
 
@@ -123,7 +144,7 @@
 
 //           <div className="cio-detail-not-found">
 //             <h2>Post not found</h2>
-//             <p>The post you're looking for doesn't exist or has been removed.</p>
+//             <p>The post you&apos;re looking for doesn&apos;t exist or has been removed.</p>
 //           </div>
 //         </div>
 //       </main>
@@ -151,12 +172,12 @@
 //                   {post.author}
 //                 </span>
 
-//                 {post.date ? (
+//                 {post.date && (
 //                   <span>
 //                     <Calendar size={15} />
 //                     {post.date}
 //                   </span>
-//                 ) : null}
+//                 )}
 //               </div>
 //             </div>
 
@@ -168,14 +189,20 @@
 //                 height={480}
 //                 unoptimized
 //                 priority
+//                 onError={(e) => {
+//                   (e.currentTarget as HTMLImageElement).src = fallbackImage;
+//                 }}
 //               />
 //             </div>
 //           </div>
 
 //           <div className="cio-detail-content">
-//             {post.content.split('\n\n').map((paragraph, index) => (
-//               <p key={`${paragraph.slice(0, 20)}-${index}`}>{paragraph}</p>
-//             ))}
+//             {post.content
+//               .split('\n\n')
+//               .filter(Boolean)
+//               .map((paragraph, index) => (
+//                 <p key={index}>{paragraph}</p>
+//               ))}
 //           </div>
 //         </article>
 //       </div>
@@ -190,6 +217,7 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+
 import {
   fetchWebsitePageBySlug,
   getPageTestimonials,
@@ -210,11 +238,12 @@ function generateSlug(text: string) {
   return text
     .toLowerCase()
     .trim()
-    .replace(/[“”‘’]/g, '')
+    .replace(/[“”‘’']/g, '')
     .replace(/&/g, 'and')
     .replace(/[^\w\s-]/g, '')
     .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
+    .replace(/-+/g, '-')
+    .slice(0, 100);
 }
 
 function getRoleMeta(role = '') {
@@ -242,7 +271,7 @@ function getValidImage(value?: string) {
 }
 
 function testimonialToPost(item: PageTestimonial): PostDetail {
-  const meta = getRoleMeta(item.role);
+  const meta = getRoleMeta(item.role || '');
 
   return {
     title: item.author || 'LeaderSpeak',
@@ -255,10 +284,15 @@ function testimonialToPost(item: PageTestimonial): PostDetail {
 
 export default function LeaderSpeakDetailPage() {
   const params = useParams<{ slug: string }>();
-  const slug = params.slug;
+  const slug = decodeURIComponent(params.slug);
 
   const [post, setPost] = useState<PostDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [imageSrc, setImageSrc] = useState(fallbackImage);
+
+  useEffect(() => {
+    setImageSrc(post?.image || fallbackImage);
+  }, [post]);
 
   useEffect(() => {
     let isMounted = true;
@@ -268,9 +302,9 @@ export default function LeaderSpeakDetailPage() {
         const response = await fetchWebsitePageBySlug('leaderspeak');
         const testimonials = getPageTestimonials(response.data);
 
-        const found = testimonials.find((item: PageTestimonial) => {
-          return generateSlug(item.author || 'LeaderSpeak') === slug;
-        });
+        const found = testimonials.find(
+          (item: PageTestimonial) => generateSlug(item.author || 'LeaderSpeak') === slug,
+        );
 
         if (isMounted) {
           setPost(found ? testimonialToPost(found) : null);
@@ -286,7 +320,7 @@ export default function LeaderSpeakDetailPage() {
       }
     }
 
-    loadPost();
+    void loadPost();
 
     return () => {
       isMounted = false;
@@ -342,31 +376,35 @@ export default function LeaderSpeakDetailPage() {
                   {post.author}
                 </span>
 
-                {post.date ? (
+                {post.date && (
                   <span>
                     <Calendar size={15} />
                     {post.date}
                   </span>
-                ) : null}
+                )}
               </div>
             </div>
 
             <div className="cio-detail-featured-image">
               <Image
-                src={post.image}
+                src={imageSrc}
                 alt={post.title}
                 width={480}
                 height={480}
-                unoptimized
                 priority
+                unoptimized
+                onError={() => setImageSrc(fallbackImage)}
               />
             </div>
           </div>
 
           <div className="cio-detail-content">
-            {post.content.split('\n\n').map((paragraph, index) => (
-              <p key={`${paragraph.slice(0, 20)}-${index}`}>{paragraph}</p>
-            ))}
+            {post.content
+              .split(/\n\s*\n/)
+              .filter((paragraph) => paragraph.trim())
+              .map((paragraph, index) => (
+                <p key={`${paragraph.slice(0, 20)}-${index}`}>{paragraph.trim()}</p>
+              ))}
           </div>
         </article>
       </div>

@@ -344,7 +344,7 @@ const leftColumnStories = [
 const popularStories = [
   {
     title: 'CIOs discuss the changing role of technology leadership in the intelligent enterprise',
-    image: '/assets/blogs/blog-2.webp',
+    image: '/assets/blogs/blog-3.webp',
   },
   {
     title: 'Enterprise leaders share practical lessons from transformation journeys',
@@ -352,11 +352,11 @@ const popularStories = [
   },
   {
     title: 'Business leaders explain how technology is reshaping strategic decision-making',
-    image: '/assets/blogs/blog-4.webp',
+    image: '/assets/blogs/blog-1.webp',
   },
   {
     title: 'Leadership conversations focus on culture, innovation, and enterprise growth',
-    image: '/assets/blogs/blog-5.webp',
+    image: '/assets/blogs/blog-1.webp',
   },
 ];
 
@@ -423,6 +423,12 @@ export default function LeaderSpeakPage() {
   const [search] = useState('');
   const [activeSection] = useState('LEADERSPEAK');
   const [isLoading, setIsLoading] = useState(true);
+
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const getImageSrc = (id: string, image: string) => {
+    return imageErrors[id] ? fallbackImage : image;
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -540,11 +546,17 @@ export default function LeaderSpeakPage() {
             <Link href={`/leaderspeak/${leadPost.slug}`} className="news-editorial-left-feature">
               <div className="news-editorial-left-feature-image">
                 <Image
-                  src={leadPost.image}
+                  src={getImageSrc(leadPost.id, leadPost.image)}
                   alt={leadPost.title}
                   fill
                   sizes="(max-width: 800px) 100vw, 260px"
                   unoptimized
+                  onError={() =>
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [leadPost.id]: true,
+                    }))
+                  }
                 />
               </div>
 
@@ -587,12 +599,17 @@ export default function LeaderSpeakPage() {
 
               <Link href={`/leaderspeak/${leadPost.slug}`} className="news-editorial-lead-image">
                 <Image
-                  src={leadPost.image}
+                  src={getImageSrc(leadPost.id, leadPost.image)}
                   alt={leadPost.title}
                   fill
-                  priority
-                  sizes="(max-width: 800px) 100vw, 650px"
+                  sizes="(max-width: 800px) 100vw, 260px"
                   unoptimized
+                  onError={() =>
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [leadPost.id]: true,
+                    }))
+                  }
                 />
               </Link>
 
@@ -619,11 +636,17 @@ export default function LeaderSpeakPage() {
                       className="news-editorial-secondary-image"
                     >
                       <Image
-                        src={post.image}
-                        alt={post.title}
+                        src={getImageSrc(leadPost.id, leadPost.image)}
+                        alt={leadPost.title}
                         fill
-                        sizes="(max-width: 600px) 100vw, 330px"
+                        sizes="(max-width: 800px) 100vw, 260px"
                         unoptimized
+                        onError={() =>
+                          setImageErrors((prev) => ({
+                            ...prev,
+                            [leadPost.id]: true,
+                          }))
+                        }
                       />
                     </Link>
                   </article>
@@ -647,11 +670,17 @@ export default function LeaderSpeakPage() {
                         className="news-editorial-latest-image"
                       >
                         <Image
-                          src={post.image}
-                          alt={post.title}
+                          src={getImageSrc(leadPost.id, leadPost.image)}
+                          alt={leadPost.title}
                           fill
-                          sizes="(max-width: 600px) 100vw, 310px"
+                          sizes="(max-width: 800px) 100vw, 260px"
                           unoptimized
+                          onError={() =>
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [leadPost.id]: true,
+                            }))
+                          }
                         />
                       </Link>
 
@@ -687,7 +716,7 @@ export default function LeaderSpeakPage() {
                   business leaders shaping the enterprise world.
                 </p>
 
-                <Link href="/leaderspeak">Explore conversations</Link>
+                {/* <Link href="/leaderspeak">Explore conversations</Link> */}
               </div>
             </section>
 

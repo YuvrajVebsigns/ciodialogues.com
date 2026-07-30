@@ -34,7 +34,7 @@ type PopularStory = {
   href: string;
 };
 
-const fallbackImage = '/assets/blogs/blog-1.webp';
+const fallbackImage = '/assets/blogs/blog-3.webp';
 
 const staticPosts: MainStoryPost[] = [];
 
@@ -62,7 +62,7 @@ const leftColumnStories: EditorialStory[] = [
 const popularStories: PopularStory[] = [
   {
     title: 'CIOs increase investments in generative artificial intelligence',
-    image: '/assets/blogs/blog-2.webp',
+    image: '/assets/blogs/blog-1.webp',
     href: '/technology',
   },
   {
@@ -72,12 +72,12 @@ const popularStories: PopularStory[] = [
   },
   {
     title: 'Technology leaders rethink cloud cost optimisation strategies',
-    image: '/assets/blogs/blog-4.webp',
+    image: '/assets/blogs/blog-1.webp',
     href: '/technology',
   },
   {
     title: 'Security teams prepare for a rapidly changing threat landscape',
-    image: '/assets/blogs/blog-5.webp',
+    image: '/assets/blogs/blog-3.webp',
     href: '/technology',
   },
 ];
@@ -162,6 +162,12 @@ export default function MainStoryPage() {
   const [posts, setPosts] = useState<MainStoryPost[]>(staticPosts);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const getImageSrc = (id: string, image: string) => {
+    return imageErrors[id] ? fallbackImage : image;
+  };
+
   useEffect(() => {
     let isMounted = true;
 
@@ -228,11 +234,17 @@ export default function MainStoryPage() {
             <Link href={`/main-story/${leadPost.slug}`} className="news-editorial-left-feature">
               <div className="news-editorial-left-feature-image">
                 <Image
-                  src={leadPost.image}
+                  src={getImageSrc(leadPost.id, leadPost.image)}
                   alt={leadPost.title}
                   fill
                   sizes="(max-width: 800px) 100vw, 260px"
                   unoptimized
+                  onError={() =>
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [leadPost.id]: true,
+                    }))
+                  }
                 />
               </div>
 
@@ -279,12 +291,17 @@ export default function MainStoryPage() {
 
               <Link href={`/main-story/${leadPost.slug}`} className="news-editorial-lead-image">
                 <Image
-                  src={leadPost.image}
+                  src={getImageSrc(leadPost.id, leadPost.image)}
                   alt={leadPost.title}
                   fill
-                  priority
-                  sizes="(max-width: 800px) 100vw, 650px"
+                  sizes="(max-width: 800px) 100vw, 260px"
                   unoptimized
+                  onError={() =>
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [leadPost.id]: true,
+                    }))
+                  }
                 />
               </Link>
 
@@ -311,11 +328,17 @@ export default function MainStoryPage() {
                       className="news-editorial-secondary-image"
                     >
                       <Image
-                        src={post.image}
-                        alt={post.title}
+                        src={getImageSrc(leadPost.id, leadPost.image)}
+                        alt={leadPost.title}
                         fill
-                        sizes="(max-width: 600px) 100vw, 330px"
+                        sizes="(max-width: 800px) 100vw, 260px"
                         unoptimized
+                        onError={() =>
+                          setImageErrors((prev) => ({
+                            ...prev,
+                            [leadPost.id]: true,
+                          }))
+                        }
                       />
                     </Link>
                   </article>
@@ -339,11 +362,17 @@ export default function MainStoryPage() {
                         className="news-editorial-latest-image"
                       >
                         <Image
-                          src={post.image}
-                          alt={post.title}
+                          src={getImageSrc(leadPost.id, leadPost.image)}
+                          alt={leadPost.title}
                           fill
-                          sizes="(max-width: 600px) 100vw, 310px"
+                          sizes="(max-width: 800px) 100vw, 260px"
                           unoptimized
+                          onError={() =>
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [leadPost.id]: true,
+                            }))
+                          }
                         />
                       </Link>
 

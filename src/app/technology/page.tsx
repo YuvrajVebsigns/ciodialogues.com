@@ -622,7 +622,7 @@ const leftColumnStories = [
 const popularStories = [
   {
     title: 'Agentic AI moves closer to mainstream enterprise deployment',
-    image: '/assets/blogs/blog-2.webp',
+    image: '/assets/blogs/blog-3.webp',
   },
   {
     title: 'Cloud modernisation becomes a boardroom technology priority',
@@ -630,11 +630,11 @@ const popularStories = [
   },
   {
     title: 'Cybersecurity teams strengthen identity-first protection strategies',
-    image: '/assets/blogs/blog-4.webp',
+    image: '/assets/blogs/blog-1.webp',
   },
   {
     title: 'Data platforms evolve to support real-time intelligence and automation',
-    image: '/assets/blogs/blog-5.webp',
+    image: '/assets/blogs/blog-1.webp',
   },
 ];
 
@@ -701,6 +701,12 @@ export default function TechnologyPage() {
   const [search] = useState('');
   const [activeSection] = useState('TECHNOLOGY');
   const [isLoading, setIsLoading] = useState(true);
+
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const getImageSrc = (id: string, image: string) => {
+    return imageErrors[id] ? fallbackImage : image;
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -810,11 +816,17 @@ export default function TechnologyPage() {
             <Link href={`/technology/${leadPost.slug}`} className="news-editorial-left-feature">
               <div className="news-editorial-left-feature-image">
                 <Image
-                  src={leadPost.image}
+                  src={getImageSrc(leadPost.id, leadPost.image)}
                   alt={leadPost.title}
                   fill
                   sizes="(max-width: 800px) 100vw, 260px"
                   unoptimized
+                  onError={() =>
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [leadPost.id]: true,
+                    }))
+                  }
                 />
               </div>
 
@@ -858,12 +870,17 @@ export default function TechnologyPage() {
 
               <Link href={`/technology/${leadPost.slug}`} className="news-editorial-lead-image">
                 <Image
-                  src={leadPost.image}
+                  src={getImageSrc(leadPost.id, leadPost.image)}
                   alt={leadPost.title}
                   fill
-                  priority
-                  sizes="(max-width: 800px) 100vw, 650px"
+                  sizes="(max-width: 800px) 100vw, 260px"
                   unoptimized
+                  onError={() =>
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [leadPost.id]: true,
+                    }))
+                  }
                 />
               </Link>
 
@@ -890,11 +907,17 @@ export default function TechnologyPage() {
                       className="news-editorial-secondary-image"
                     >
                       <Image
-                        src={post.image}
-                        alt={post.title}
+                        src={getImageSrc(leadPost.id, leadPost.image)}
+                        alt={leadPost.title}
                         fill
-                        sizes="(max-width: 600px) 100vw, 330px"
+                        sizes="(max-width: 800px) 100vw, 260px"
                         unoptimized
+                        onError={() =>
+                          setImageErrors((prev) => ({
+                            ...prev,
+                            [leadPost.id]: true,
+                          }))
+                        }
                       />
                     </Link>
                   </article>
@@ -918,11 +941,17 @@ export default function TechnologyPage() {
                         className="news-editorial-latest-image"
                       >
                         <Image
-                          src={post.image}
-                          alt={post.title}
+                          src={getImageSrc(leadPost.id, leadPost.image)}
+                          alt={leadPost.title}
                           fill
-                          sizes="(max-width: 600px) 100vw, 310px"
+                          sizes="(max-width: 800px) 100vw, 260px"
                           unoptimized
+                          onError={() =>
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [leadPost.id]: true,
+                            }))
+                          }
                         />
                       </Link>
 

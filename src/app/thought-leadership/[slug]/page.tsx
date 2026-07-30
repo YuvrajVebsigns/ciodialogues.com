@@ -263,6 +263,11 @@ export default function ThoughtLeadershipDetailPage() {
   const [post, setPost] = useState<PostDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [imageSrc, setImageSrc] = useState(fallbackImage);
+  useEffect(() => {
+    setImageSrc(post?.image || fallbackImage);
+  }, [post]);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -364,12 +369,13 @@ export default function ThoughtLeadershipDetailPage() {
 
             <div className="cio-detail-featured-image">
               <Image
-                src={post.image}
+                src={imageSrc}
                 alt={post.title}
                 width={480}
                 height={480}
                 priority
                 unoptimized
+                onError={() => setImageSrc(fallbackImage)}
               />
             </div>
           </div>

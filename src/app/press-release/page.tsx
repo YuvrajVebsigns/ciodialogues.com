@@ -344,7 +344,7 @@ const leftColumnStories = [
 const popularStories = [
   {
     title: 'Technology company announces expanded enterprise transformation partnership',
-    image: '/assets/blogs/blog-2.webp',
+    image: '/assets/blogs/blog-1.webp',
   },
   {
     title: 'New leadership appointment strengthens digital and technology strategy',
@@ -352,11 +352,11 @@ const popularStories = [
   },
   {
     title: 'Enterprise platform launch focuses on automation, data, and customer experience',
-    image: '/assets/blogs/blog-4.webp',
+    image: '/assets/blogs/blog-1.webp',
   },
   {
     title: 'Strategic business milestone supports the next phase of regional expansion',
-    image: '/assets/blogs/blog-5.webp',
+    image: '/assets/blogs/blog-3.webp',
   },
 ];
 
@@ -423,6 +423,12 @@ export default function PressReleasePage() {
   const [search] = useState('');
   const [activeSection] = useState('PRESS RELEASE');
   const [isLoading, setIsLoading] = useState(true);
+
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const getImageSrc = (id: string, image: string) => {
+    return imageErrors[id] ? fallbackImage : image;
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -535,11 +541,17 @@ export default function PressReleasePage() {
             <Link href={`/press-release/${leadPost.slug}`} className="news-editorial-left-feature">
               <div className="news-editorial-left-feature-image">
                 <Image
-                  src={leadPost.image}
+                  src={getImageSrc(leadPost.id, leadPost.image)}
                   alt={leadPost.title}
                   fill
                   sizes="(max-width: 800px) 100vw, 260px"
                   unoptimized
+                  onError={() =>
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [leadPost.id]: true,
+                    }))
+                  }
                 />
               </div>
 
@@ -583,12 +595,17 @@ export default function PressReleasePage() {
 
               <Link href={`/press-release/${leadPost.slug}`} className="news-editorial-lead-image">
                 <Image
-                  src={leadPost.image}
+                  src={getImageSrc(leadPost.id, leadPost.image)}
                   alt={leadPost.title}
                   fill
-                  priority
-                  sizes="(max-width: 800px) 100vw, 650px"
+                  sizes="(max-width: 800px) 100vw, 260px"
                   unoptimized
+                  onError={() =>
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [leadPost.id]: true,
+                    }))
+                  }
                 />
               </Link>
 
@@ -615,11 +632,17 @@ export default function PressReleasePage() {
                       className="news-editorial-secondary-image"
                     >
                       <Image
-                        src={post.image}
-                        alt={post.title}
+                        src={getImageSrc(leadPost.id, leadPost.image)}
+                        alt={leadPost.title}
                         fill
-                        sizes="(max-width: 600px) 100vw, 330px"
+                        sizes="(max-width: 800px) 100vw, 260px"
                         unoptimized
+                        onError={() =>
+                          setImageErrors((prev) => ({
+                            ...prev,
+                            [leadPost.id]: true,
+                          }))
+                        }
                       />
                     </Link>
                   </article>
@@ -643,11 +666,17 @@ export default function PressReleasePage() {
                         className="news-editorial-latest-image"
                       >
                         <Image
-                          src={post.image}
-                          alt={post.title}
+                          src={getImageSrc(leadPost.id, leadPost.image)}
+                          alt={leadPost.title}
                           fill
-                          sizes="(max-width: 600px) 100vw, 310px"
+                          sizes="(max-width: 800px) 100vw, 260px"
                           unoptimized
+                          onError={() =>
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [leadPost.id]: true,
+                            }))
+                          }
                         />
                       </Link>
 
@@ -683,7 +712,7 @@ export default function PressReleasePage() {
                   launches, and industry developments.
                 </p>
 
-                <Link href="/press-release">Explore releases</Link>
+                {/* <Link href="/press-release">Explore releases</Link> */}
               </div>
             </section>
 

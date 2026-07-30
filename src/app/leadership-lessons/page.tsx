@@ -544,19 +544,19 @@ const leftColumnStories = [
 const popularStories = [
   {
     title: 'How technology leaders build resilient teams during periods of disruption',
-    image: '/assets/blogs/blog-2.webp',
-  },
-  {
-    title: 'Executive decision-making evolves for the intelligent enterprise',
     image: '/assets/blogs/blog-3.webp',
   },
   {
+    title: 'Executive decision-making evolves for the intelligent enterprise',
+    image: '/assets/blogs/blog-1.webp',
+  },
+  {
     title: 'Leadership culture becomes central to successful digital transformation',
-    image: '/assets/blogs/blog-4.webp',
+    image: '/assets/blogs/blog-1.webp',
   },
   {
     title: 'CIOs strengthen collaboration between technology and business teams',
-    image: '/assets/blogs/blog-5.webp',
+    image: '/assets/blogs/blog-1.webp',
   },
 ];
 
@@ -623,6 +623,12 @@ export default function LeadershipLessonsPage() {
   const [search] = useState('');
   const [activeSection] = useState('LEADERSHIP LESSONS');
   const [isLoading, setIsLoading] = useState(true);
+
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const getImageSrc = (id: string, image: string) => {
+    return imageErrors[id] ? fallbackImage : image;
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -739,11 +745,17 @@ export default function LeadershipLessonsPage() {
             >
               <div className="news-editorial-left-feature-image">
                 <Image
-                  src={leadPost.image}
+                  src={getImageSrc(leadPost.id, leadPost.image)}
                   alt={leadPost.title}
                   fill
                   sizes="(max-width: 800px) 100vw, 260px"
                   unoptimized
+                  onError={() =>
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [leadPost.id]: true,
+                    }))
+                  }
                 />
               </div>
 
@@ -790,12 +802,17 @@ export default function LeadershipLessonsPage() {
                 className="news-editorial-lead-image"
               >
                 <Image
-                  src={leadPost.image}
+                  src={getImageSrc(leadPost.id, leadPost.image)}
                   alt={leadPost.title}
                   fill
-                  priority
-                  sizes="(max-width: 800px) 100vw, 650px"
+                  sizes="(max-width: 800px) 100vw, 260px"
                   unoptimized
+                  onError={() =>
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [leadPost.id]: true,
+                    }))
+                  }
                 />
               </Link>
 
@@ -822,11 +839,17 @@ export default function LeadershipLessonsPage() {
                       className="news-editorial-secondary-image"
                     >
                       <Image
-                        src={post.image}
-                        alt={post.title}
+                        src={getImageSrc(leadPost.id, leadPost.image)}
+                        alt={leadPost.title}
                         fill
-                        sizes="(max-width: 600px) 100vw, 330px"
+                        sizes="(max-width: 800px) 100vw, 260px"
                         unoptimized
+                        onError={() =>
+                          setImageErrors((prev) => ({
+                            ...prev,
+                            [leadPost.id]: true,
+                          }))
+                        }
                       />
                     </Link>
                   </article>
@@ -850,11 +873,17 @@ export default function LeadershipLessonsPage() {
                         className="news-editorial-latest-image"
                       >
                         <Image
-                          src={post.image}
-                          alt={post.title}
+                          src={getImageSrc(leadPost.id, leadPost.image)}
+                          alt={leadPost.title}
                           fill
-                          sizes="(max-width: 600px) 100vw, 310px"
+                          sizes="(max-width: 800px) 100vw, 260px"
                           unoptimized
+                          onError={() =>
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [leadPost.id]: true,
+                            }))
+                          }
                         />
                       </Link>
 
@@ -890,7 +919,7 @@ export default function LeadershipLessonsPage() {
                   industry leaders.
                 </p>
 
-                <Link href="/leadership-lessons">Explore lessons</Link>
+                {/* <Link href="/leadership-lessons">Explore lessons</Link> */}
               </div>
             </section>
 

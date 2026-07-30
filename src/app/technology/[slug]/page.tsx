@@ -260,6 +260,12 @@ export default function TechnologyDetailPage() {
   const [post, setPost] = useState<PostDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [imageSrc, setImageSrc] = useState(fallbackImage);
+  useEffect(() => {
+    setImageSrc(post?.image || fallbackImage);
+  }, [post]);
+  0;
+
   useEffect(() => {
     let isMounted = true;
 
@@ -353,12 +359,13 @@ export default function TechnologyDetailPage() {
 
             <div className="cio-detail-featured-image">
               <Image
-                src={post.image}
+                src={imageSrc}
                 alt={post.title}
                 width={480}
                 height={480}
-                unoptimized
                 priority
+                unoptimized
+                onError={() => setImageSrc(fallbackImage)}
               />
             </div>
           </div>

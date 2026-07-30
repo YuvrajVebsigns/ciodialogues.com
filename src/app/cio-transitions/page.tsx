@@ -62,22 +62,22 @@ const leftColumnStories: EditorialStory[] = [
 const popularStories: PopularStory[] = [
   {
     title: 'CIOs increase investments in generative artificial intelligence',
-    image: '/assets/blogs/blog-2.webp',
+    image: '/assets/blogs/blog-3.webp',
     href: '/technology',
   },
   {
     title: 'Data governance framework becomes an enterprise priority',
-    image: '/assets/blogs/blog-3.webp',
+    image: '/assets/blogs/blog-1.webp',
     href: '/business-insights',
   },
   {
     title: 'Technology leaders rethink cloud cost optimisation strategies',
-    image: '/assets/blogs/blog-4.webp',
+    image: '/assets/blogs/blog-3.webp',
     href: '/technology',
   },
   {
     title: 'Security teams prepare for a rapidly changing threat landscape',
-    image: '/assets/blogs/blog-5.webp',
+    image: '/assets/blogs/blog-1.webp',
     href: '/technology',
   },
 ];
