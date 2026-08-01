@@ -114,7 +114,7 @@ export default function ContactSection() {
           ) : null}
 
           {/* Badge */}
-          <div className="contact-badge">⬢ GET IN TOUCH</div>
+          <div className="contact-badge">GET IN TOUCH</div>
 
           {/* Title */}
           {/* <h2 className="contact-title">Let’s Start a Conversation</h2> */}

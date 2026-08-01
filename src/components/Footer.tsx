@@ -29,16 +29,16 @@ export default function Footer() {
                 <Image
                   src="/assets/logo/logo.webp"
                   alt="CIO Dialogues"
-                  width={150}
+                  width={250}
                   height={70}
                   priority
                 />
               </Link>
 
-              <p className="footer-description">
+              {/* <p className="footer-description">
                 CIO Dialogues is a premier platform connecting CIOs, CISOs, CTOs and business
                 leaders through thought leadership, insights, events and industry conversations.
-              </p>
+              </p> */}
             </div>
 
             <div className="footer-widget">
@@ -122,32 +122,46 @@ export default function Footer() {
                 <Phone size={15} />
               </span>
 
-              <span className="footer-contact-text">+91 7506035537</span>
+              <span className="footer-contact-text">+91 22 4608 0974</span>
             </a>
 
-            <a href="mailto:contact@core-mediagroup.com" className="footer-contact-item">
-              <span className="footer-contact-icon">
+            <div className="footer-contact-item">
+              {/* <span className="footer-contact-icon">
                 <Mail size={15} />
-              </span>
+              </span> */}
 
-              <span className="footer-contact-text">contact@core-mediagroup.com</span>
-            </a>
+              <a
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=contact@core-mediagroup.com&su=Enquiry"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-contact-item"
+              >
+                <span className="footer-contact-icon">
+                  <Mail size={15} />
+                </span>
+
+                <span className="footer-contact-text">contact@core-mediagroup.com</span>
+              </a>
+            </div>
           </div>
 
           <div className="footer-socials">
-            <a href="https://www.facebook.com/" aria-label="Facebook">
+            <a href="https://www.facebook.com/CIOCrown.in" aria-label="Facebook">
               <FaFacebookF />
             </a>
 
-            <a href="https://www.instagram.com/" aria-label="Instagram">
+            <a href="https://www.instagram.com/core_media_/" aria-label="Instagram">
               <FaInstagram />
             </a>
 
-            <a href="https://x.com/" aria-label="Twitter">
+            <a href="https://x.com/CIOChoice" aria-label="Twitter">
               <FaXTwitter />
             </a>
 
-            <a href="https://www.linkedin.com/" aria-label="LinkedIn">
+            <a
+              href="https://www.linkedin.com/groups/CENTRE-RECOGNITION-EXCELLENCE-CIO-CHOICE-54013"
+              aria-label="LinkedIn"
+            >
               <FaLinkedinIn />
             </a>
           </div>

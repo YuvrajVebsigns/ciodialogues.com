@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 interface Dialogue {
@@ -152,7 +152,26 @@ function AnimatedDialogueCard({
     once: false,
   });
 
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const [showReadMore, setShowReadMore] = useState(false);
+
   const isExpanded = expandedCard === cardKey;
+
+  useEffect(() => {
+    if (!textRef.current) return;
+
+    const checkOverflow = () => {
+      if (!textRef.current) return;
+      setShowReadMore(textRef.current.scrollHeight > textRef.current.clientHeight + 2);
+    };
+
+    requestAnimationFrame(checkOverflow);
+    window.addEventListener('resize', checkOverflow);
+
+    return () => {
+      window.removeEventListener('resize', checkOverflow);
+    };
+  }, [dialogue.quote]);
 
   return (
     <article ref={ref} className="dialogue-card" style={{ transitionDelay: `${index * 60}ms` }}>
@@ -165,17 +184,22 @@ function AnimatedDialogueCard({
       />
 
       <div className="dialogue-text">
-        <p className={`dialogue-description ${isExpanded ? 'expanded' : 'collapsed'}`}>
+        <p
+          ref={textRef}
+          className={`dialogue-description ${isExpanded ? 'expanded' : 'collapsed'}`}
+        >
           {dialogue.quote}
         </p>
 
-        <button
-          type="button"
-          className="dialogue-read-more"
-          onClick={() => setExpandedCard(isExpanded ? null : cardKey)}
-        >
-          {isExpanded ? 'Read Less' : 'Read More'}
-        </button>
+        {showReadMore && (
+          <button
+            type="button"
+            className="dialogue-read-more"
+            onClick={() => setExpandedCard(isExpanded ? null : cardKey)}
+          >
+            {isExpanded ? 'Read Less' : 'Read More'}
+          </button>
+        )}
       </div>
 
       <div className="dialogue-divider" />

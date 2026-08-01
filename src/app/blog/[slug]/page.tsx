@@ -162,6 +162,8 @@ export default function BlogDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [showShareOptions, setShowShareOptions] = useState(false);
 
+  const [imageSrc, setImageSrc] = useState('/assets/blogs/blog-1.webp');
+
   useEffect(() => {
     let isMounted = true;
 
@@ -203,6 +205,12 @@ export default function BlogDetailsPage() {
     };
   }, [slug]);
 
+  useEffect(() => {
+    if (blog) {
+      setImageSrc(getBlogImage(blog));
+    }
+  }, [blog]);
+
   if (isLoading) {
     return (
       <main className="blog-detail-page">
@@ -237,7 +245,7 @@ export default function BlogDetailsPage() {
   const displayTitle = blog.title;
   const displayCategory = getBlogCategory(blog);
   const displayDate = formatPublishedDate(blog.publishedAt);
-  const displayImage = getBlogImage(blog);
+  // const displayImage = getBlogImage(blog);
   const contentBlocks = getBlogContentBlocks(blog);
   const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/blog/${slug}` : '';
 
@@ -291,13 +299,23 @@ export default function BlogDetailsPage() {
           animationClass="animate-fade-in"
           initialTransform="translateY(28px)"
         >
-          <Image
+          {/* <Image
             src={displayImage}
             alt={displayTitle}
             fill
             priority
             className="blogpage-media-image"
             unoptimized
+          /> */}
+
+          <Image
+            src={imageSrc}
+            alt={displayTitle}
+            fill
+            priority
+            className="blogpage-media-image"
+            unoptimized
+            onError={() => setImageSrc('/assets/blogs/blog-1.webp')}
           />
         </AnimatedBlock>
 
@@ -329,14 +347,14 @@ export default function BlogDetailsPage() {
                 animationClass="animate-fade-in"
                 initialTransform="translateY(18px)"
               >
-                <Link href="/blog" className="backbutton">
-                  <div className="backbutton-icon">
-                    <ArrowUpLeft size={18} />
-                  </div>
-
+                <Link href="/blog" className="talk-btn">
                   <span>Back to Blog</span>
+                  <div className="talk-btn-icon">
+                    <ArrowUpRight size={18} />
+                  </div>
                 </Link>
               </AnimatedBlock>
+              {/* <br /> */}
 
               <AnimatedBlock
                 className="blog-back-link"
@@ -357,8 +375,6 @@ export default function BlogDetailsPage() {
                       <ArrowUpRight size={18} />
                     </div>
                   </button>
-
-                  <br />
 
                   {showShareOptions ? (
                     <div className="share-popup" role="menu" aria-labelledby="share-button">

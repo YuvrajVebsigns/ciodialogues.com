@@ -15,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'CIO Dialoguesss',
+  title: 'CIO DIALOGUES',
   // description: 'Core Media Administration Dashboard — Manage users, media, and system settings.',
   keywords: ['admin', 'dashboard', 'core media', 'management'],
   robots: 'noindex, nofollow',
