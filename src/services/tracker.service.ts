@@ -1,6 +1,8 @@
 /**
  * CoreMediaTracker - Client-side tracking utility
  */
+import { API_ENDPOINTS } from '@/constants/api';
+
 export interface TrackerConfig {
   backendUrl: string;
   token: string;
@@ -60,16 +62,18 @@ export class CoreMediaTracker {
     return localStorage.getItem(this.cookieConsentKey); // 'accepted', 'declined', or null
   }
 
-  setConsent(status: 'accepted' | 'declined') {
+  setConsent(status: 'accepted' | 'declined', trackEvent = true) {
     if (typeof window === 'undefined') return;
     if (status !== 'accepted' && status !== 'declined') return;
 
     localStorage.setItem(this.cookieConsentKey, status);
 
-    // Log the consent decision to the backend
-    this.trackEvent({
-      eventType: status === 'accepted' ? 'consent_accepted' : 'consent_declined',
-    });
+    if (trackEvent) {
+      // Log the consent decision to the backend
+      this.trackEvent({
+        eventType: status === 'accepted' ? 'consent_accepted' : 'consent_declined',
+      });
+    }
   }
 
   // Core Track Method
@@ -99,7 +103,7 @@ export class CoreMediaTracker {
     };
 
     try {
-      await fetch(`${this.backendUrl}/website/analytics/track`, {
+      await fetch(`${this.backendUrl}${API_ENDPOINTS.WEBSITE.ANALYTICS.TRACK}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
