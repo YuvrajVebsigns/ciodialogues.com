@@ -14549,6 +14549,150 @@ s .dialogues-badge-mark {
 }
 
 /* =========================================================
+   SUBSCRIBE TOAST / POPUP
+========================================================= */
+
+.subscribe-toast {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 14px;
+
+  background: #ffffff;
+
+  border: 1px solid rgba(142, 1, 1, 0.25);
+  border-left: 4px solid #8e0101;
+
+  box-shadow: 0 10px 25px rgba(91, 0, 0, 0.12);
+
+  animation: subscribeToastIn 0.3s ease forwards;
+}
+
+.subscribe-toast-dot {
+  width: 8px;
+  height: 8px;
+
+  flex: 0 0 8px;
+
+  border-radius: 50%;
+
+  background: #8e0101;
+}
+
+.subscribe-toast-message {
+  flex: 1;
+
+  margin: 0;
+
+  color: #4d2929;
+
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.subscribe-toast-close {
+  width: 26px;
+  height: 26px;
+
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 26px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+  color: #8e0101;
+
+  font-size: 21px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.subscribe-toast-close:hover {
+  background: #8e0101;
+  color: #ffffff;
+
+  transform: rotate(90deg);
+}
+
+/* =========================================================
+   TOAST ANIMATION
+========================================================= */
+
+@keyframes subscribeToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   SUBSCRIBE BUTTON DISABLED
+========================================================= */
+
+.footer-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.footer-submit:disabled:hover {
+  background: #8e0101;
+}
+
+.footer-submit:disabled:hover svg {
+  transform: none;
+}
+
+.footer-input:disabled {
+  background: #f8f2f2;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   MOBILE POPUP
+========================================================= */
+
+@media (max-width: 768px) {
+  .subscribe-toast {
+    padding: 11px 12px;
+  }
+
+  .subscribe-toast-message {
+    font-size: 12px;
+  }
+
+  .subscribe-toast-close {
+    width: 24px;
+    height: 24px;
+
+    flex-basis: 24px;
+
+    font-size: 19px;
+  }
+}
+
+/* =========================================================
    TABLET
 ========================================================= */
 
