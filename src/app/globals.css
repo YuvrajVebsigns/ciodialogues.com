@@ -19666,12 +19666,38 @@ s .dialogues-badge-mark {
 
   display: grid;
   grid-template-columns: 1fr auto;
-  align-items: center;
+  align-items: start;
   gap: 40px;
 }
 
 .cookie-consent-header {
-  display: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  grid-column: 1 / -1;
+}
+
+.cookie-consent-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cookie-consent-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8e0101;
+}
+
+.cookie-consent-title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 900;
+  color: #111827;
 }
 
 .cookie-consent-body {

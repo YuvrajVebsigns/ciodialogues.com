@@ -14,17 +14,33 @@ interface TrackingProviderProps {
   children: ReactNode;
 }
 
+const COOKIE_CONSENT_KEY = 'core_media_cookie_consent';
+
+const getStoredConsent = (): 'accepted' | 'declined' | null => {
+  if (typeof window === 'undefined') return null;
+  const stored = localStorage.getItem(COOKIE_CONSENT_KEY);
+  return stored === 'accepted' || stored === 'declined' ? stored : null;
+};
+
+const setStoredConsent = (status: 'accepted' | 'declined') => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(COOKIE_CONSENT_KEY, status);
+};
+
 // Sub-component to listen to route transitions without de-opting Layout to CSR-only pre-rendering.
 function RouteChangeListener({ tracker }: { tracker: CoreMediaTracker }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const lastTrackedUrlRef = React.useRef('');
 
   useEffect(() => {
-    // Only track if consent has been accepted
-    if (tracker.getConsentStatus() === 'accepted') {
-      const fullUrl = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
-      tracker.trackPageview(fullUrl, document.title);
-    }
+    if (tracker.getConsentStatus() !== 'accepted') return;
+
+    const fullUrl = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
+    if (lastTrackedUrlRef.current === fullUrl) return;
+
+    tracker.trackPageview(fullUrl, document.title);
+    lastTrackedUrlRef.current = fullUrl;
   }, [pathname, searchParams, tracker]);
 
   return null;
@@ -34,8 +50,10 @@ export default function TrackingProvider({ children }: TrackingProviderProps) {
   const [tracker, setTracker] = useState<CoreMediaTracker | null>(null);
   const [consent, setConsent] = useState<'accepted' | 'declined' | null>(null);
 
-  // Initialize tracking authentication dynamically
+  // Initialize consent and tracking authentication dynamically
   useEffect(() => {
+    setConsent(getStoredConsent());
+
     async function initTracker() {
       try {
         const auth = await ensureWebsiteAuth();
@@ -47,7 +65,18 @@ export default function TrackingProvider({ children }: TrackingProviderProps) {
             token: auth.token,
           });
           setTracker(trackerInstance);
-          setConsent(trackerInstance.getConsentStatus() as 'accepted' | 'declined' | null);
+          const storedConsent = getStoredConsent();
+          if (storedConsent === 'accepted') {
+            if (trackerInstance.getConsentStatus() !== 'accepted') {
+              trackerInstance.setConsent('accepted', false);
+            }
+            setConsent('accepted');
+          } else if (storedConsent === 'declined') {
+            trackerInstance.setConsent('declined', false);
+            setConsent('declined');
+          } else {
+            setConsent(trackerInstance.getConsentStatus() as 'accepted' | 'declined' | null);
+          }
         }
       } catch {
         // Fail silently
@@ -100,24 +129,25 @@ export default function TrackingProvider({ children }: TrackingProviderProps) {
   }, [tracker, consent]);
 
   const handleAcceptConsent = () => {
-    if (!tracker) return;
-    tracker.setConsent('accepted');
+    setStoredConsent('accepted');
+    if (tracker) {
+      tracker.setConsent('accepted', false);
+    }
     setConsent('accepted');
-    // Track immediate pageview on acceptance
-    const currentUrl = window.location.pathname + window.location.search;
-    tracker.trackPageview(currentUrl, document.title);
   };
 
   const handleDeclineConsent = () => {
-    if (!tracker) return;
-    tracker.setConsent('declined');
+    setStoredConsent('declined');
+    if (tracker) {
+      tracker.setConsent('declined', false);
+    }
     setConsent('declined');
   };
 
   return (
     <TrackingContext.Provider value={tracker}>
       {children}
-      {tracker && consent === null && (
+      {consent === null && (
         <CookieConsentBanner onAccept={handleAcceptConsent} onDecline={handleDeclineConsent} />
       )}
       {tracker && consent === 'accepted' && (
