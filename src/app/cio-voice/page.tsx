@@ -336,8 +336,8 @@ export default function CIOVoicePage() {
                         unoptimized
                       /> */}
                       <Image
-                        src={getImageSrc(leadPost.id, leadPost.image)}
-                        alt={leadPost.title}
+                        src={getImageSrc(post.id, post.image)}
+                        alt={post.title}
                         fill
                         priority
                         sizes="(max-width: 800px) 100vw, 650px"
@@ -345,7 +345,7 @@ export default function CIOVoicePage() {
                         onError={() =>
                           setImageErrors((prev) => ({
                             ...prev,
-                            [leadPost.id]: true,
+                            [post.id]: true,
                           }))
                         }
                       />

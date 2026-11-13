@@ -253,11 +253,12 @@ import { useEffect, useState } from 'react';
 import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
 
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import { fetchWebsiteEvents, type WebsiteEvent } from '@/services/events.service';
-
-function getEventImage(item: WebsiteEvent): string {
-  return String(item.image ?? item.heroImage ?? item.banner ?? '/assets/blogs/blog-1.webp');
-}
+import {
+  FALLBACK_WEBSITE_EVENT_IMAGE,
+  fetchWebsiteEvents,
+  getWebsiteEventImage,
+  type WebsiteEvent,
+} from '@/services/events.service';
 
 function formatDate(date?: string): string {
   if (!date) return 'Upcoming';
@@ -404,7 +405,7 @@ export default function EventsPage() {
                 const title = String(item.title ?? item.name ?? item.eventName ?? 'Event');
 
                 const slug = createEventSlug(item, title);
-                const imageSrc = getEventImage(item);
+                const imageSrc = getWebsiteEventImage(item);
                 const category = String(item.type ?? item.category ?? 'Event');
                 const date = formatDate(item.startDate ?? item.startsAt);
 
@@ -437,6 +438,11 @@ export default function EventsPage() {
                         className="upcoming-events__image"
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         unoptimized
+                        onError={(event) => {
+                          if (!event.currentTarget.src.endsWith(FALLBACK_WEBSITE_EVENT_IMAGE)) {
+                            event.currentTarget.src = FALLBACK_WEBSITE_EVENT_IMAGE;
+                          }
+                        }}
                       />
 
                       <span className="upcoming-events__category">{category}</span>

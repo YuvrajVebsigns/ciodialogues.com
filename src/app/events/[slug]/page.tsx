@@ -10,6 +10,7 @@ import ClientErrorBoundary from '@/components/ClientErrorBoundary';
 import EventDetailsAnimated from '@/components/EventDetailsAnimated';
 import EventSponsorsSection from '@/components/EventSponsorsSection';
 import {
+  getWebsiteEventImage,
   fetchWebsiteEventByIdOrSlug,
   fetchWebsiteEvents,
   type WebsiteEvent,
@@ -264,12 +265,7 @@ export default function EventDetailsPage() {
       getEventField(event, 'organizer') ?? getEventField(event, 'author') ?? 'CORE Media',
     ),
     date: String(getEventField(event, 'startsAt') ?? getEventField(event, 'date') ?? ''),
-    heroImage: String(
-      getEventField(event, 'image') ??
-        getEventField(event, 'heroImage') ??
-        getEventField(event, 'banner') ??
-        '/assets/blogs/blog-1.webp',
-    ),
+    heroImage: getWebsiteEventImage(event),
     badge: String(getEventField(event, 'category') ?? 'Events'),
     summary: extractTextFromContent(
       getEventField(event, 'description') ?? getEventField(event, 'summary') ?? '',

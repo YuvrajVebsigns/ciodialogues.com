@@ -21,6 +21,8 @@ export type WebsiteEvent = {
   [key: string]: unknown;
 };
 
+export const FALLBACK_WEBSITE_EVENT_IMAGE = '/assets/blogs/blog-1.webp';
+
 type RawEvent = Record<string, unknown>;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -33,6 +35,65 @@ function getRecordValue(source: unknown, key: string): unknown {
 
 function getStringValue(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
+}
+
+function getImageUrl(value: unknown): string | undefined {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const imageUrl = getImageUrl(item);
+      if (imageUrl) return imageUrl;
+    }
+
+    return undefined;
+  }
+
+  if (typeof value === 'string') {
+    const imageUrl = value.trim();
+    const normalizedUrl = imageUrl.toLowerCase();
+
+    return imageUrl && normalizedUrl !== 'null' && normalizedUrl !== 'undefined'
+      ? imageUrl
+      : undefined;
+  }
+
+  if (!isRecord(value)) return undefined;
+
+  for (const key of [
+    'url',
+    'src',
+    'path',
+    'secure_url',
+    'image',
+    'imageUrl',
+    'thumbnail',
+    'thumbnailUrl',
+    'fileUrl',
+    'original',
+  ]) {
+    const imageUrl = getImageUrl(value[key]);
+    if (imageUrl) return imageUrl;
+  }
+
+  return undefined;
+}
+
+export function getWebsiteEventImage(event: WebsiteEvent): string {
+  for (const key of [
+    'image',
+    'heroImage',
+    'banner',
+    'coverImage',
+    'thumbnail',
+    'imageUrl',
+    'thumbnailUrl',
+    'poster',
+    'media',
+  ]) {
+    const imageUrl = getImageUrl(event[key]);
+    if (imageUrl) return imageUrl;
+  }
+
+  return FALLBACK_WEBSITE_EVENT_IMAGE;
 }
 
 function normalizeEvent(it: RawEvent): WebsiteEvent {

@@ -839,15 +839,15 @@ export default function LeadershipLessonsPage() {
                       className="news-editorial-secondary-image"
                     >
                       <Image
-                        src={getImageSrc(leadPost.id, leadPost.image)}
-                        alt={leadPost.title}
+                        src={getImageSrc(post.id, post.image)}
+                        alt={post.title}
                         fill
                         sizes="(max-width: 800px) 100vw, 260px"
                         unoptimized
                         onError={() =>
                           setImageErrors((prev) => ({
                             ...prev,
-                            [leadPost.id]: true,
+                            [post.id]: true,
                           }))
                         }
                       />
@@ -873,15 +873,15 @@ export default function LeadershipLessonsPage() {
                         className="news-editorial-latest-image"
                       >
                         <Image
-                          src={getImageSrc(leadPost.id, leadPost.image)}
-                          alt={leadPost.title}
+                          src={getImageSrc(post.id, post.image)}
+                          alt={post.title}
                           fill
                           sizes="(max-width: 800px) 100vw, 260px"
                           unoptimized
                           onError={() =>
                             setImageErrors((prev) => ({
                               ...prev,
-                              [leadPost.id]: true,
+                              [post.id]: true,
                             }))
                           }
                         />

@@ -1,6 +1,12 @@
 import { API_ENDPOINTS } from '@/constants/api';
 import { apiFetch } from '@/services/apiFetch';
-import { buildWebsiteAuthHeaders, ensureWebsiteAuth, getWebsiteDomain } from '@/lib/website-auth';
+import {
+  buildWebsiteAuthHeaders,
+  clearWebsiteAuth,
+  ensureWebsiteAuth,
+  getApiErrorStatus,
+  getWebsiteDomain,
+} from '@/lib/website-auth';
 
 export interface WebsitePageContentBlock {
   id?: string;
@@ -80,18 +86,28 @@ function normalizePageResponse(res: unknown): WebsitePageApiResponse {
 
 export async function fetchWebsitePageBySlug(slug: string): Promise<WebsitePageApiResponse> {
   const domain = getWebsiteDomain();
-  const auth = await ensureWebsiteAuth(domain);
+  const endpoint = API_ENDPOINTS.WEBSITE.PAGES.BY_SLUG(slug);
+  const fetchPage = async (token: Awaited<ReturnType<typeof ensureWebsiteAuth>>) =>
+    apiFetch<unknown>(endpoint, {
+      requireAuth: false,
+      method: 'GET',
+      headers: {
+        ...buildWebsiteAuthHeaders(token),
+        'x-website-domain': domain,
+      },
+    });
 
-  const headers = {
-    ...buildWebsiteAuthHeaders(auth),
-    'x-website-domain': domain,
-  };
+  let res: unknown;
+  try {
+    res = await fetchPage(await ensureWebsiteAuth(domain));
+  } catch (error) {
+    if (getApiErrorStatus(error) !== 401) {
+      throw error;
+    }
 
-  const res = await apiFetch<unknown>(API_ENDPOINTS.WEBSITE.PAGES.BY_SLUG(slug), {
-    requireAuth: false,
-    method: 'GET',
-    headers,
-  });
+    clearWebsiteAuth();
+    res = await fetchPage(await ensureWebsiteAuth(domain));
+  }
 
   return normalizePageResponse(res);
 }

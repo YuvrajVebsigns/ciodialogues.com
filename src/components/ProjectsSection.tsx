@@ -140,11 +140,12 @@ import Link from 'next/link';
 import { ArrowUpRight, CalendarDays, Users, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import { fetchWebsiteEvents, WebsiteEvent } from '@/services/events.service';
-
-function getEventImage(item: WebsiteEvent): string {
-  return String(item.image ?? item.heroImage ?? item.banner ?? '/assets/blogs/blog-1.webp');
-}
+import {
+  FALLBACK_WEBSITE_EVENT_IMAGE,
+  fetchWebsiteEvents,
+  getWebsiteEventImage,
+  type WebsiteEvent,
+} from '@/services/events.service';
 
 function formatDate(date?: string): string {
   if (!date) return 'Upcoming';
@@ -211,7 +212,7 @@ export default function ProjectsSection() {
             events.slice(0, 2).map((item, index) => {
               const title = String(item.title ?? item.name ?? item.eventName ?? 'Event');
               const slug = String(item.slug ?? item.id ?? title.toLowerCase().replace(/\s+/g, '-'));
-              const imageSrc = getEventImage(item);
+              const imageSrc = getWebsiteEventImage(item);
               const category = String(item.type ?? item.category ?? 'Event');
               const date = formatDate(item.startDate ?? item.startsAt);
               const totalRegistrations =
@@ -231,6 +232,11 @@ export default function ProjectsSection() {
                         sizes="(max-width: 768px) 100vw, 50vw"
                         className="project-modern-image"
                         unoptimized
+                        onError={(event) => {
+                          if (!event.currentTarget.src.endsWith(FALLBACK_WEBSITE_EVENT_IMAGE)) {
+                            event.currentTarget.src = FALLBACK_WEBSITE_EVENT_IMAGE;
+                          }
+                        }}
                       />
 
                       <div className="project-modern-image-shine" />
