@@ -385,7 +385,12 @@ export default function CIOVoicePage() {
                         />
                       </Link>
 
-                      <span>{post.category}</span>
+                      <div className="news-editorial-latest-meta">
+                        <small>
+                          {post.author}
+                          {post.date ? ` · ${post.date}` : ''}
+                        </small>
+                      </div>
 
                       <Link href={`/cio-voice/${post.slug}`}>
                         <h3>{post.title}</h3>

@@ -199,7 +199,7 @@ export default function BespokePage() {
   const latestPosts = posts.slice(3);
 
   return (
-    <main className="news-editorial-page">
+    <main className="news-editorial-page bespoke-editorial-page">
       {isLoading ? (
         <section className="news-editorial-status">
           <h2>Loading stories...</h2>

@@ -309,7 +309,7 @@ export default function Navbar() {
               className={`nav-link ${isActive('/leadership-lessons') ? 'active' : ''}`}
               onClick={closeMenus}
             >
-              LEADERSHIP
+              LEADERSHIP LESSONS
             </Link>
 
             <Link
