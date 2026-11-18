@@ -95,6 +95,12 @@ async function proxyRequest(request: NextRequest) {
   headers.delete('host');
   headers.delete('connection');
   headers.delete('content-length');
+  headers.delete('accept-encoding');
+  headers.delete('expect');
+  headers.delete('te');
+  headers.delete('trailer');
+  headers.delete('transfer-encoding');
+  headers.delete('upgrade');
 
   const init: RequestInit = {
     method: request.method,
@@ -106,7 +112,17 @@ async function proxyRequest(request: NextRequest) {
     init.body = await request.arrayBuffer();
   }
 
-  const response = await fetch(upstreamUrl, init);
+  let response: Response;
+
+  try {
+    response = await fetch(upstreamUrl, init);
+  } catch {
+    return NextResponse.json(
+      { message: 'The upstream API could not be reached.' },
+      { status: 502 },
+    );
+  }
+
   const responseHeaders = new Headers(response.headers);
   responseHeaders.delete('content-encoding');
   responseHeaders.delete('content-length');
