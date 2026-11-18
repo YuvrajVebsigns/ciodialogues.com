@@ -1,15 +1,15 @@
 // 'use client';
 
-// import { useEffect, useState } from 'react';
 // import Image from 'next/image';
 // import Link from 'next/link';
+// import { useEffect, useState } from 'react';
 // import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
-
-// import { fetchWebsiteEvents, type WebsiteEvent } from '@/services/events.service';
-
-// function getEventImage(item: WebsiteEvent): string {
-//   return String(item.image ?? item.heroImage ?? item.banner ?? '/assets/blogs/blog-1.webp');
-// }
+// import {
+//   FALLBACK_WEBSITE_EVENT_IMAGE,
+//   fetchWebsiteEvents,
+//   getWebsiteEventImage,
+//   type WebsiteEvent,
+// } from '@/services/events.service';
 
 // function formatDate(date?: string): string {
 //   if (!date) return 'Upcoming';
@@ -63,9 +63,7 @@
 //         if (isMounted) {
 //           setEvents(Array.isArray(data) ? data : []);
 //         }
-//       } catch (error) {
-//         console.error('Unable to fetch website events:', error);
-
+//       } catch {
 //         if (isMounted) {
 //           setEvents([]);
 //         }
@@ -90,12 +88,18 @@
 //           <div className="upcoming-events__header">
 //             <div className="upcoming-events__loading-heading">
 //               <div className="upcoming-events__skeleton upcoming-events__skeleton--badge" />
+
 //               <div className="upcoming-events__skeleton upcoming-events__skeleton--title" />
 //             </div>
 
 //             <div className="upcoming-events__skeleton upcoming-events__skeleton--button" />
 //           </div>
 
+//           {/* <div className="upcoming-events__grid">
+//             {[1, 2, 3].map((item) => (
+//               <div key={item} className="upcoming-events__skeleton-card" aria-hidden="true"/>
+//             ))}
+//           </div> */}
 //           <div className="upcoming-events__grid">
 //             {[1, 2, 3].map((item) => (
 //               <div key={item} className="upcoming-events__skeleton-card" aria-hidden="true" />
@@ -123,7 +127,6 @@
 //               Work <span className="upcoming-events__title-highlight">Highlights &amp; Events</span>
 //             </h2>
 //           </div>
-
 //           <Link href="/events" className="upcoming-events__view-all">
 //             <span>See All Events</span>
 //             <ArrowRight size={15} />
@@ -135,10 +138,8 @@
 //             const title = String(item.title ?? item.name ?? item.eventName ?? 'Event');
 
 //             const slug = createEventSlug(item, title);
-//             const imageSrc = getEventImage(item);
-
+//             const imageSrc = getWebsiteEventImage(item);
 //             const category = String(item.type ?? item.category ?? 'Conference');
-
 //             const date = formatDate(item.startDate ?? item.startsAt);
 
 //             const location = String(
@@ -170,6 +171,11 @@
 //                     className="upcoming-events__image"
 //                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
 //                     unoptimized
+//                     onError={(event) => {
+//                       if (!event.currentTarget.src.endsWith(FALLBACK_WEBSITE_EVENT_IMAGE)) {
+//                         event.currentTarget.src = FALLBACK_WEBSITE_EVENT_IMAGE;
+//                       }
+//                     }}
 //                   />
 
 //                   <span className="upcoming-events__category">{category}</span>
@@ -221,10 +227,10 @@
 
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
+
 import {
   FALLBACK_WEBSITE_EVENT_IMAGE,
   fetchWebsiteEvents,
@@ -240,9 +246,7 @@ function formatDate(date?: string): string {
       ? new Date(`${date}T00:00:00`)
       : new Date(date);
 
-    if (Number.isNaN(parsedDate.getTime())) {
-      return 'Upcoming';
-    }
+    if (Number.isNaN(parsedDate.getTime())) return 'Upcoming';
 
     return parsedDate.toLocaleDateString('en-IN', {
       day: '2-digit',
@@ -255,19 +259,86 @@ function formatDate(date?: string): string {
 }
 
 function createEventSlug(item: WebsiteEvent, title: string): string {
-  if (item.slug) {
-    return String(item.slug);
-  }
-
-  if (item.id) {
-    return String(item.id);
-  }
+  if (item.slug) return String(item.slug);
+  if (item.id) return String(item.id);
 
   return title
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+// Extract image URL from strings or backend image objects.
+function extractImageUrl(value: unknown): string {
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+
+  if (value && typeof value === 'object') {
+    const image = value as Record<string, unknown>;
+
+    const possibleKeys = [
+      'url',
+      'src',
+      'path',
+      'imageUrl',
+      'image',
+      'secure_url',
+      'original',
+      'originalUrl',
+    ];
+
+    for (const key of possibleKeys) {
+      const result = extractImageUrl(image[key]);
+
+      if (result) return result;
+    }
+  }
+
+  return '';
+}
+
+// Get the actual event image from different possible API fields.
+function getEventImage(item: WebsiteEvent): string {
+  const event = item as Record<string, unknown>;
+
+  const imageFields = [
+    'image',
+    'imageUrl',
+    'eventImage',
+    'eventImageUrl',
+    'banner',
+    'bannerImage',
+    'bannerUrl',
+    'coverImage',
+    'thumbnail',
+    'thumbnailUrl',
+    'featuredImage',
+    'featured_image',
+    'poster',
+    'media',
+  ];
+
+  for (const field of imageFields) {
+    const imageUrl = extractImageUrl(event[field]);
+
+    if (imageUrl) {
+      // console.log(`Event image found (${field}):`, imageUrl);
+      return imageUrl;
+    }
+  }
+
+  // Try the existing service helper as a final fallback.
+  const serviceImage = getWebsiteEventImage(item);
+
+  if (serviceImage && serviceImage !== FALLBACK_WEBSITE_EVENT_IMAGE) {
+    return serviceImage;
+  }
+
+  // console.warn('No backend image found for event:', item);
+
+  return FALLBACK_WEBSITE_EVENT_IMAGE;
 }
 
 export default function UpcomingEventsGrid() {
@@ -281,10 +352,14 @@ export default function UpcomingEventsGrid() {
       try {
         const data = await fetchWebsiteEvents();
 
+        // console.log('Events API Response:', data);
+
         if (isMounted) {
           setEvents(Array.isArray(data) ? data : []);
         }
-      } catch {
+      } catch (error) {
+        // console.error('Failed to load events:', error);
+
         if (isMounted) {
           setEvents([]);
         }
@@ -309,18 +384,12 @@ export default function UpcomingEventsGrid() {
           <div className="upcoming-events__header">
             <div className="upcoming-events__loading-heading">
               <div className="upcoming-events__skeleton upcoming-events__skeleton--badge" />
-
               <div className="upcoming-events__skeleton upcoming-events__skeleton--title" />
             </div>
 
             <div className="upcoming-events__skeleton upcoming-events__skeleton--button" />
           </div>
 
-          {/* <div className="upcoming-events__grid">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="upcoming-events__skeleton-card" aria-hidden="true"/>
-            ))}
-          </div> */}
           <div className="upcoming-events__grid">
             {[1, 2, 3].map((item) => (
               <div key={item} className="upcoming-events__skeleton-card" aria-hidden="true" />
@@ -331,9 +400,7 @@ export default function UpcomingEventsGrid() {
     );
   }
 
-  if (events.length === 0) {
-    return null;
-  }
+  if (events.length === 0) return null;
 
   const displayEvents = events.slice(0, 3);
 
@@ -348,6 +415,7 @@ export default function UpcomingEventsGrid() {
               Work <span className="upcoming-events__title-highlight">Highlights &amp; Events</span>
             </h2>
           </div>
+
           <Link href="/events" className="upcoming-events__view-all">
             <span>See All Events</span>
             <ArrowRight size={15} />
@@ -359,8 +427,10 @@ export default function UpcomingEventsGrid() {
             const title = String(item.title ?? item.name ?? item.eventName ?? 'Event');
 
             const slug = createEventSlug(item, title);
-            const imageSrc = getWebsiteEventImage(item);
+            const imageSrc = getEventImage(item);
+
             const category = String(item.type ?? item.category ?? 'Conference');
+
             const date = formatDate(item.startDate ?? item.startsAt);
 
             const location = String(
@@ -385,16 +455,19 @@ export default function UpcomingEventsGrid() {
                   className="upcoming-events__media"
                   aria-label={`View ${title}`}
                 >
-                  <Image
+                  <img
                     src={imageSrc}
                     alt={title}
-                    fill
                     className="upcoming-events__image"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    unoptimized
+                    loading="lazy"
                     onError={(event) => {
-                      if (!event.currentTarget.src.endsWith(FALLBACK_WEBSITE_EVENT_IMAGE)) {
-                        event.currentTarget.src = FALLBACK_WEBSITE_EVENT_IMAGE;
+                      const img = event.currentTarget;
+
+                      // console.error('Event image failed to load:', img.src);
+
+                      if (!img.dataset.fallback && img.src !== FALLBACK_WEBSITE_EVENT_IMAGE) {
+                        img.dataset.fallback = 'true';
+                        img.src = FALLBACK_WEBSITE_EVENT_IMAGE;
                       }
                     }}
                   />

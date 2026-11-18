@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { ArrowRight, ArrowUpRight, Calendar } from 'lucide-react';
 
 import { fetchWebsiteBlogs, type WebsiteBlogItem } from '@/services/blogs.service';
+
 import {
   fetchWebsitePageBySlug,
   getPageTestimonials,
@@ -13,30 +14,25 @@ import {
 } from '@/services/pages.service';
 
 const channels = [
-  {
-    label: 'CIO Voice',
-    href: '/cio-voice',
-  },
-  {
-    label: 'Thought Leadership',
-    href: '/thought-leadership',
-  },
-  {
-    label: 'Business Insights',
-    href: '/business-insights',
-  },
-  {
-    label: 'Technology Solutions',
-    href: '/category/technology-solutions',
-  },
-  {
-    label: 'Leadership Lessons',
-    href: '/leadership-lessons',
-  },
+  { label: 'CIO Voice', href: '/cio-voice' },
+  { label: 'Thought Leadership', href: '/thought-leadership' },
+  { label: 'Business Insights', href: '/business-insights' },
+  { label: 'Technology Solutions', href: '/category/technology-solutions' },
+  { label: 'Leadership Lessons', href: '/leadership-lessons' },
 ];
 
 const FALLBACK_EDITORIAL_IMAGE = '/assets/blogs/blog-1.webp';
 const MAX_THOUGHT_ITEMS = 1;
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.core-mediagroup.com';
+
+const BACKEND_ORIGIN = (() => {
+  try {
+    return new URL(API_BASE_URL).origin;
+  } catch {
+    return '';
+  }
+})();
 
 type ThoughtPost = {
   id: string;
@@ -48,21 +44,133 @@ type ThoughtPost = {
   image: string;
 };
 
-function getValidImage(value?: string) {
-  if (!value) return FALLBACK_EDITORIAL_IMAGE;
+/* =========================================
+   IMAGE URL HANDLING
+========================================= */
 
-  const trimmed = value.trim();
-  if (!trimmed) return FALLBACK_EDITORIAL_IMAGE;
-  if (trimmed.toLowerCase() === 'null' || trimmed.toLowerCase() === 'undefined')
-    return FALLBACK_EDITORIAL_IMAGE;
+function extractImageUrl(value: unknown): string {
+  if (!value) return '';
 
-  return trimmed;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+
+    if (!trimmed || trimmed.toLowerCase() === 'null' || trimmed.toLowerCase() === 'undefined') {
+      return '';
+    }
+
+    if (/^https?:\/\//i.test(trimmed)) {
+      return trimmed;
+    }
+
+    if (trimmed.startsWith('//')) {
+      return `https:${trimmed}`;
+    }
+
+    if (trimmed.startsWith('/')) {
+      return BACKEND_ORIGIN ? `${BACKEND_ORIGIN}${trimmed}` : trimmed;
+    }
+
+    return BACKEND_ORIGIN ? `${BACKEND_ORIGIN}/${trimmed.replace(/^\/+/, '')}` : `/${trimmed}`;
+  }
+
+  if (typeof value === 'object' && value !== null) {
+    const record = value as Record<string, unknown>;
+
+    const fields = [
+      'url',
+      'src',
+      'path',
+      'imageUrl',
+      'secure_url',
+      'original',
+      'large',
+      'medium',
+      'thumbnail',
+    ];
+
+    for (const field of fields) {
+      const nestedValue = record[field];
+
+      if (nestedValue) {
+        const result = extractImageUrl(nestedValue);
+
+        if (result) return result;
+      }
+    }
+
+    if (record.urlVariants) {
+      const result = extractImageUrl(record.urlVariants);
+
+      if (result) return result;
+    }
+  }
+
+  return '';
 }
+
+function getValidImage(value: unknown): string {
+  return extractImageUrl(value) || FALLBACK_EDITORIAL_IMAGE;
+}
+
+function getBlogImage(blog: WebsiteBlogItem): string {
+  const candidates: unknown[] = [blog.featureImage, blog.seo?.ogImage];
+
+  for (const candidate of candidates) {
+    const imageUrl = extractImageUrl(candidate);
+
+    if (imageUrl) return imageUrl;
+  }
+
+  return FALLBACK_EDITORIAL_IMAGE;
+}
+
+/* =========================================
+   IMAGE ERROR HANDLING
+========================================= */
+
+function handleImageError(event: React.SyntheticEvent<HTMLImageElement>) {
+  const image = event.currentTarget;
+
+  if (image.src.includes(FALLBACK_EDITORIAL_IMAGE)) {
+    return;
+  }
+
+  image.src = FALLBACK_EDITORIAL_IMAGE;
+}
+
+/* =========================================
+   TEXT HELPERS
+========================================= */
 
 function cleanThoughtText(text: string, limit = 120) {
   const normalized = text.replace(/\s+/g, ' ').trim();
+
   return normalized.length > limit ? `${normalized.slice(0, limit)}...` : normalized;
 }
+
+function formatDate(date?: string) {
+  if (!date) return 'Recent';
+
+  const value = new Date(date);
+
+  if (Number.isNaN(value.getTime())) {
+    return 'Recent';
+  }
+
+  return value.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+function getBlogCategory(blog: WebsiteBlogItem) {
+  return blog.websites?.[0]?.name || blog.tags?.[0] || 'Insight';
+}
+
+/* =========================================
+   THOUGHT LEADERSHIP MAPPING
+========================================= */
 
 function mapTestimonialsToThoughtPosts(testimonials: PageTestimonial[]): ThoughtPost[] {
   return testimonials
@@ -70,7 +178,9 @@ function mapTestimonialsToThoughtPosts(testimonials: PageTestimonial[]): Thought
     .slice(0, MAX_THOUGHT_ITEMS)
     .map((item, index) => {
       const title = item.author || 'Thought Leadership';
+
       const date = item.role?.split('|')[1]?.trim() || '';
+
       return {
         id: `${title}-${index}`,
         title,
@@ -90,46 +200,20 @@ function mapTestimonialsToThoughtPosts(testimonials: PageTestimonial[]): Thought
     });
 }
 
-function isValidImageUrl(value?: string): value is string {
-  if (typeof value !== 'string') return false;
-
-  const trimmed = value.trim();
-  if (!trimmed) return false;
-  if (trimmed.toLowerCase() === 'null' || trimmed.toLowerCase() === 'undefined') return false;
-
-  return true;
-}
-
-function getBlogCategory(blog: WebsiteBlogItem) {
-  return blog.websites?.[0]?.name || blog.tags?.[0] || 'Insight';
-}
-
-function getBlogImage(blog: WebsiteBlogItem) {
-  const candidate = blog.featureImage || blog.seo?.ogImage;
-  return isValidImageUrl(candidate) ? candidate : FALLBACK_EDITORIAL_IMAGE;
-}
-
-function formatDate(date?: string) {
-  if (!date) return 'Recent';
-
-  const value = new Date(date);
-
-  if (isNaN(value.getTime())) {
-    return 'Recent';
-  }
-
-  return value.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
+/* =========================================
+   MAIN COMPONENT
+========================================= */
 
 export default function EditorialHeroGrid() {
   const [blogs, setBlogs] = useState<WebsiteBlogItem[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [thoughtPosts, setThoughtPosts] = useState<ThoughtPost[]>([]);
   const [isThoughtLoading, setIsThoughtLoading] = useState(true);
+
+  /* =====================================
+     LOAD BLOGS
+  ===================================== */
 
   useEffect(() => {
     let mounted = true;
@@ -137,9 +221,10 @@ export default function EditorialHeroGrid() {
     async function loadBlogs() {
       try {
         const response = await fetchWebsiteBlogs(1, 5);
+        const blogData = response.data?.data || [];
 
         if (mounted) {
-          setBlogs(response.data?.data || []);
+          setBlogs(blogData);
         }
       } catch {
         if (mounted) {
@@ -151,11 +236,17 @@ export default function EditorialHeroGrid() {
         }
       }
     }
+
     loadBlogs();
+
     return () => {
       mounted = false;
     };
   }, []);
+
+  /* =====================================
+     LOAD THOUGHT LEADERSHIP
+  ===================================== */
 
   useEffect(() => {
     let mounted = true;
@@ -163,6 +254,7 @@ export default function EditorialHeroGrid() {
     async function loadThoughtLeadership() {
       try {
         const response = await fetchWebsitePageBySlug('thought-leadership');
+
         const testimonials = getPageTestimonials(response.data);
         const items = mapTestimonialsToThoughtPosts(testimonials);
 
@@ -187,16 +279,23 @@ export default function EditorialHeroGrid() {
     };
   }, []);
 
+  /* =====================================
+     LOADING SKELETON
+  ===================================== */
+
   if (loading) {
     return (
       <section className="editorial-hero-grid">
         <div className="editorial-hero-grid__grid">
           <div className="editorial-hero-grid__skeleton-image" />
+
           <div className="editorial-hero-grid__skeleton-column">
             <div className="editorial-hero-grid__skeleton-heading" />
+
             {[1, 2, 3, 4].map((item) => (
               <div key={item} className="editorial-hero-grid__trending-item">
                 <div className="editorial-hero-grid__skeleton-thumb" />
+
                 <div>
                   <div className="editorial-hero-grid__skeleton-line" />
                   <div className="editorial-hero-grid__skeleton-line" />
@@ -204,11 +303,16 @@ export default function EditorialHeroGrid() {
               </div>
             ))}
           </div>
+
           <div className="editorial-hero-grid__skeleton-panel" />
         </div>
       </section>
     );
   }
+
+  /* =====================================
+     EMPTY STATE
+  ===================================== */
 
   if (!blogs.length) {
     return (
@@ -217,12 +321,19 @@ export default function EditorialHeroGrid() {
       </div>
     );
   }
+
   const featured = blogs[0]!;
   const latestBlogs = blogs.slice(1, 4);
+
+  /* =====================================
+     MAIN CONTENT
+  ===================================== */
+
   return (
     <section className="editorial-hero-grid">
       <div className="editorial-hero-grid__grid">
-        {/* Featured Article */}
+        {/* FEATURED ARTICLE */}
+
         <article className="editorial-hero-grid__featured-card">
           <div className="editorial-hero-grid__featured-media">
             <Image
@@ -233,10 +344,7 @@ export default function EditorialHeroGrid() {
               unoptimized
               sizes="(max-width:768px) 100vw, 50vw"
               className="editorial-hero-grid__featured-image"
-              onError={(event) => {
-                const target = event.currentTarget as HTMLImageElement;
-                if (target) target.src = FALLBACK_EDITORIAL_IMAGE;
-              }}
+              onError={handleImageError}
             />
 
             <div className="editorial-hero-grid__featured-overlay">
@@ -265,11 +373,13 @@ export default function EditorialHeroGrid() {
           </div>
         </article>
 
-        {/* Latest Updates */}
+        {/* LATEST UPDATES */}
+
         <div className="editorial-hero-grid__trending-column">
           <div className="editorial-hero-grid__trending-heading-wrap">
             <h3 className="editorial-hero-grid__trending-heading">Latest Updates</h3>
           </div>
+
           {latestBlogs.map((blog) => (
             <article key={blog.id} className="editorial-hero-grid__trending-item">
               <div className="editorial-hero-grid__trending-thumb">
@@ -280,19 +390,19 @@ export default function EditorialHeroGrid() {
                   unoptimized
                   sizes="90px"
                   className="editorial-hero-grid__trending-image"
-                  onError={(event) => {
-                    const target = event.currentTarget as HTMLImageElement;
-                    if (target) target.src = FALLBACK_EDITORIAL_IMAGE;
-                  }}
+                  onError={handleImageError}
                 />
               </div>
+
               <div>
                 <span className="editorial-hero-grid__trending-category">
                   {getBlogCategory(blog)}
                 </span>
+
                 <h4 className="editorial-hero-grid__trending-title">
                   <Link href={`/blog/${blog.slug}`}>{blog.title}</Link>
                 </h4>
+
                 <span className="editorial-hero-grid__trending-date">
                   {formatDate(blog.publishedAt)}
                 </span>
@@ -300,10 +410,15 @@ export default function EditorialHeroGrid() {
             </article>
           ))}
         </div>
-        {/* Sidebar */}
+
+        {/* SIDEBAR */}
+
         <aside className="editorial-hero-grid__sidebar">
+          {/* THOUGHT LEADERSHIP */}
+
           <div className="editorial-hero-grid__thought-leadership">
             <h6 className="editorial-hero-grid__newsletter-title">Latest Thought Leadership</h6>
+
             {isThoughtLoading ? (
               <div className="editorial-hero-grid__loading-state">
                 Loading latest thought leadership...
@@ -321,12 +436,10 @@ export default function EditorialHeroGrid() {
                     height={80}
                     className="editorial-hero-grid__thought-image"
                     unoptimized
-                    onError={(event) => {
-                      const target = event.currentTarget as HTMLImageElement;
-                      if (target) target.src = FALLBACK_EDITORIAL_IMAGE;
-                    }}
+                    onError={handleImageError}
                   />
                 </Link>
+
                 <div className="editorial-hero-grid__thought-content">
                   <div className="editorial-hero-grid__thought-header">
                     <Link
@@ -336,7 +449,9 @@ export default function EditorialHeroGrid() {
                       {thoughtPosts[0].title}
                     </Link>
                   </div>
+
                   <p className="editorial-hero-grid__thought-excerpt">{thoughtPosts[0].excerpt}</p>
+
                   {thoughtPosts[0].excerpt.length > 100 ? (
                     <Link
                       href={`/thought-leadership/${thoughtPosts[0].slug}`}
@@ -349,23 +464,8 @@ export default function EditorialHeroGrid() {
               </article>
             ) : null}
           </div>
-          {/* <div className="editorial-hero-grid__channels">
-            <h4 className="editorial-hero-grid__channels-label">Explore Channels</h4>
-            <div className="editorial-hero-grid__channels-list">
-              {[
-                'CIO Voice',
-                'Thought Leadership',
-                'Business Insights',
-                'Technology Solutions',
-                'Leadership Lessons',
-              ].map((item) => (
-                <Link key={item} href="#" className="editorial-hero-grid__channel-link">
-                  {item}
-                  <ArrowUpRight size={14} />
-                </Link>
-              ))}
-            </div>
-          </div> */}
+
+          {/* EXPLORE CHANNELS */}
 
           <div className="editorial-hero-grid__channels">
             <h4 className="editorial-hero-grid__channels-label">Explore Channels</h4>

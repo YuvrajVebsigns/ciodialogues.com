@@ -1892,10 +1892,9 @@ main {
 .editorial-hero-grid__featured-media {
   position: relative;
   width: 100%;
-  height: clamp(470px, 39vw, 610px);
-
+  height: clamp(160px, 39vw, 610px);
   overflow: hidden;
-  background: #dddddd;
+  background: #071a3a;
 }
 
 .editorial-hero-grid__featured-image {
@@ -2076,7 +2075,7 @@ main {
 }
 
 .editorial-hero-grid__trending-heading::after {
-  content: 'LATEST';
+  content: 'BLOGS';
 
   color: var(--news-red);
 
@@ -19272,12 +19271,13 @@ s .dialogues-badge-mark {
 
   display: block;
   overflow: hidden;
-
+  height: 220px;
   background: #f9fafb;
 }
 
 .upcoming-events__image {
   object-fit: contain;
+  height: 210px;
   object-position: center;
 }
 
