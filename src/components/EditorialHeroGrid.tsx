@@ -44,6 +44,14 @@ type ThoughtPost = {
   image: string;
 };
 
+type PressReleasePost = {
+  id: string;
+  title: string;
+  date: string;
+  excerpt: string;
+  slug: string;
+};
+
 /* =========================================
    IMAGE URL HANDLING
 ========================================= */
@@ -190,12 +198,38 @@ function mapTestimonialsToThoughtPosts(testimonials: PageTestimonial[]): Thought
         slug: title
           .toLowerCase()
           .trim()
-          .replace(/[“”‘’]/g, '')
+          .replace(/[“”‘’']/g, '')
           .replace(/&/g, 'and')
           .replace(/[^\w\s-]/g, '')
           .replace(/\s+/g, '-')
-          .replace(/-+/g, '-'),
+          .replace(/-+/g, '-')
+          .slice(0, 100),
         image: getValidImage(item.avatar),
+      };
+    });
+}
+
+function mapTestimonialsToPressReleasePosts(testimonials: PageTestimonial[]): PressReleasePost[] {
+  return testimonials
+    .filter((item) => item.author || item.quote || item.avatar)
+    .slice(0, 1)
+    .map((item, index) => {
+      const title = item.author || 'Press Release';
+
+      return {
+        id: `${title}-${index}`,
+        title,
+        date: item.role?.split('|')[1]?.trim() || '',
+        excerpt: cleanThoughtText(item.quote || 'Read the latest press release.', 140),
+        slug: title
+          .toLowerCase()
+          .trim()
+          .replace(/[“”‘’']/g, '')
+          .replace(/&/g, 'and')
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .slice(0, 100),
       };
     });
 }
@@ -210,6 +244,10 @@ export default function EditorialHeroGrid() {
 
   const [thoughtPosts, setThoughtPosts] = useState<ThoughtPost[]>([]);
   const [isThoughtLoading, setIsThoughtLoading] = useState(true);
+
+  const [pressReleases, setPressReleases] = useState<PressReleasePost[]>([]);
+  const [isPressReleasesLoading, setIsPressReleasesLoading] = useState(true);
+  const [pressReleasesError, setPressReleasesError] = useState(false);
 
   /* =====================================
      LOAD BLOGS
@@ -244,16 +282,45 @@ export default function EditorialHeroGrid() {
     };
   }, []);
 
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadPressReleases() {
+      try {
+        const response = await fetchWebsitePageBySlug('press-release');
+        const posts = mapTestimonialsToPressReleasePosts(getPageTestimonials(response.data));
+
+        if (mounted) {
+          setPressReleases(posts);
+        }
+      } catch {
+        if (mounted) {
+          setPressReleasesError(true);
+        }
+      } finally {
+        if (mounted) {
+          setIsPressReleasesLoading(false);
+        }
+      }
+    }
+
+    loadPressReleases();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   /* =====================================
-     LOAD THOUGHT LEADERSHIP
+     LOAD LEADERSPEAK
   ===================================== */
 
   useEffect(() => {
     let mounted = true;
 
-    async function loadThoughtLeadership() {
+    async function loadLeaderSpeak() {
       try {
-        const response = await fetchWebsitePageBySlug('thought-leadership');
+        const response = await fetchWebsitePageBySlug('leaderspeak');
 
         const testimonials = getPageTestimonials(response.data);
         const items = mapTestimonialsToThoughtPosts(testimonials);
@@ -272,7 +339,7 @@ export default function EditorialHeroGrid() {
       }
     }
 
-    loadThoughtLeadership();
+    loadLeaderSpeak();
 
     return () => {
       mounted = false;
@@ -332,46 +399,91 @@ export default function EditorialHeroGrid() {
   return (
     <section className="editorial-hero-grid">
       <div className="editorial-hero-grid__grid">
-        {/* FEATURED ARTICLE */}
+        <div className="editorial-hero-grid__featured-column">
+          {/* FEATURED ARTICLE */}
 
-        <article className="editorial-hero-grid__featured-card">
-          <div className="editorial-hero-grid__featured-media">
-            <Image
-              src={getBlogImage(featured)}
-              alt={featured.title || 'Featured blog'}
-              fill
-              priority
-              unoptimized
-              sizes="(max-width:768px) 100vw, 50vw"
-              className="editorial-hero-grid__featured-image"
-              onError={handleImageError}
-            />
+          <article className="editorial-hero-grid__featured-card">
+            <div className="editorial-hero-grid__featured-media">
+              <Image
+                src={getBlogImage(featured)}
+                alt={featured.title || 'Featured blog'}
+                fill
+                priority
+                unoptimized
+                sizes="(max-width:768px) 100vw, 50vw"
+                className="editorial-hero-grid__featured-image"
+                onError={handleImageError}
+              />
 
-            <div className="editorial-hero-grid__featured-overlay">
-              <div>
-                <div className="editorial-hero-grid__meta-row">
-                  <span className="editorial-hero-grid__meta-item">
-                    <Calendar size={13} />
-                    {formatDate(featured.publishedAt)}
-                  </span>
+              <div className="editorial-hero-grid__featured-overlay">
+                <div>
+                  <div className="editorial-hero-grid__meta-row">
+                    <span className="editorial-hero-grid__meta-item">
+                      <Calendar size={13} />
+                      {formatDate(featured.publishedAt)}
+                    </span>
+                  </div>
+
+                  <div className="editorial-hero-grid__featured-title-row">
+                    <h2 className="editorial-hero-grid__featured-title">
+                      <Link href={`/blog/${featured.slug}`}>{featured.title}</Link>
+                    </h2>
+
+                    <Link
+                      href={`/blog/${featured.slug}`}
+                      className="editorial-hero-grid__read-more"
+                    >
+                      Read Full Story
+                      <ArrowRight size={16} />
+                    </Link>
+                  </div>
+
+                  <p className="editorial-hero-grid__featured-excerpt">{featured.excerpt || ''}</p>
                 </div>
-
-                <h2 className="editorial-hero-grid__featured-title">
-                  <Link href={`/blog/${featured.slug}`}>{featured.title}</Link>
-                </h2>
-
-                <p className="editorial-hero-grid__featured-excerpt">
-                  {featured.excerpt || 'Read latest technology and leadership insights.'}
-                </p>
               </div>
+            </div>
+          </article>
 
-              <Link href={`/blog/${featured.slug}`} className="editorial-hero-grid__read-more">
-                Read Full Story
-                <ArrowRight size={16} />
+          {/* PRESS RELEASES */}
+
+          <section className="editorial-hero-grid__press-releases" aria-label="Press releases">
+            <div className="editorial-hero-grid__press-releases-heading">
+              <h3>Latest Press Release</h3>
+              <Link href="/press-release">
+                View all
+                <ArrowUpRight size={14} />
               </Link>
             </div>
-          </div>
-        </article>
+
+            {isPressReleasesLoading ? (
+              <p className="editorial-hero-grid__press-releases-message">
+                Loading press releases...
+              </p>
+            ) : pressReleasesError ? (
+              <p className="editorial-hero-grid__press-releases-message">
+                Press releases are temporarily unavailable.
+              </p>
+            ) : pressReleases.length ? (
+              <div className="editorial-hero-grid__press-releases-list">
+                {pressReleases.map((post) => (
+                  <article key={post.id} className="editorial-hero-grid__press-release">
+                    {post.date ? (
+                      <span className="editorial-hero-grid__press-release-date">{post.date}</span>
+                    ) : null}
+                    <h4>
+                      <Link href={`/press-release/${post.slug}`}>{post.title}</Link>
+                    </h4>
+                    <p>{post.excerpt}</p>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="editorial-hero-grid__press-releases-message">
+                No press releases are available right now.
+              </p>
+            )}
+          </section>
+        </div>
 
         {/* LATEST UPDATES */}
 
@@ -414,10 +526,10 @@ export default function EditorialHeroGrid() {
         {/* SIDEBAR */}
 
         <aside className="editorial-hero-grid__sidebar">
-          {/* THOUGHT LEADERSHIP */}
+          {/* LEADERSPEAK */}
 
           <div className="editorial-hero-grid__thought-leadership">
-            <h6 className="editorial-hero-grid__newsletter-title">Latest Thought Leadership</h6>
+            <h6 className="editorial-hero-grid__newsletter-title">Latest LeaderSpeak</h6>
 
             {isThoughtLoading ? (
               <div className="editorial-hero-grid__loading-state">
@@ -426,7 +538,7 @@ export default function EditorialHeroGrid() {
             ) : thoughtPosts[0] ? (
               <article key={thoughtPosts[0].id} className="editorial-hero-grid__thought-item">
                 <Link
-                  href={`/thought-leadership/${thoughtPosts[0].slug}`}
+                  href={`/leaderspeak/${thoughtPosts[0].slug}`}
                   className="editorial-hero-grid__thought-image-link"
                 >
                   <Image
@@ -443,7 +555,7 @@ export default function EditorialHeroGrid() {
                 <div className="editorial-hero-grid__thought-content">
                   <div className="editorial-hero-grid__thought-header">
                     <Link
-                      href={`/thought-leadership/${thoughtPosts[0].slug}`}
+                      href={`/leaderspeak/${thoughtPosts[0].slug}`}
                       className="editorial-hero-grid__thought-title"
                     >
                       {thoughtPosts[0].title}
@@ -454,7 +566,7 @@ export default function EditorialHeroGrid() {
 
                   {thoughtPosts[0].excerpt.length > 100 ? (
                     <Link
-                      href={`/thought-leadership/${thoughtPosts[0].slug}`}
+                      href={`/leaderspeak/${thoughtPosts[0].slug}`}
                       className="editorial-hero-grid__thought-readmore"
                     >
                       Read More...
