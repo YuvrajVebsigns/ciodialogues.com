@@ -4,20 +4,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-
-interface Dialogue {
-  id: number;
-  slug: string;
-  title: string;
-  quote: string;
-  author: string;
-  role: string;
-  avatar: string;
-  date: string;
-}
+import { MOCK_DIALOGUES } from '@/constants/mockData';
+import { fetchDialogues, type DialogueItem } from '@/services/dialogue-page.service';
 
 export default function DialoguesPage() {
-  const [dialogues, setDialogues] = useState<Dialogue[]>([]);
+  const [dialogues, setDialogues] = useState<DialogueItem[]>(MOCK_DIALOGUES);
+  const [dialoguesLoadError, setDialoguesLoadError] = useState(false);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
   const heroMediaRef = useScrollAnimation<HTMLDivElement>({
@@ -34,14 +26,23 @@ export default function DialoguesPage() {
     once: false,
   });
 
-  const featuredDialogues = dialogues.slice(0, 3);
-  const repeatedDialogues = Array.from({ length: 3 }, () => featuredDialogues).flat();
-
   useEffect(() => {
-    fetch('/api/dialoges')
-      .then((res) => res.json())
-      .then((data) => setDialogues(data))
-      .catch(() => setDialogues([]));
+    let isMounted = true;
+
+    async function loadDialogues() {
+      try {
+        const items = await fetchDialogues(MOCK_DIALOGUES);
+        if (isMounted) setDialogues(items);
+      } catch {
+        if (isMounted) setDialoguesLoadError(true);
+      }
+    }
+
+    void loadDialogues();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -92,8 +93,14 @@ export default function DialoguesPage() {
           <br />
           <br />
 
+          <p className="sr-only" role="status" aria-live="polite">
+            {dialoguesLoadError
+              ? 'Live dialogues could not be loaded. Showing saved dialogues.'
+              : ''}
+          </p>
+
           <div className="dialogues-list">
-            {repeatedDialogues.map((d, index) => {
+            {dialogues.map((d, index) => {
               const variant =
                 index % 3 === 0
                   ? 'animate-fade-in-left'
@@ -124,7 +131,7 @@ export default function DialoguesPage() {
 
 type AnimatedDialogueCardProps = {
   cardKey: string;
-  dialogue: Dialogue;
+  dialogue: DialogueItem;
   index: number;
   variant?: string;
   expandedCard: string | null;

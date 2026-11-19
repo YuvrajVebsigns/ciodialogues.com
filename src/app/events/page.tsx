@@ -9,7 +9,9 @@ import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import {
   FALLBACK_WEBSITE_EVENT_IMAGE,
   fetchWebsiteEvents,
+  getWebsiteEventLocation,
   getWebsiteEventImage,
+  resolveWebsiteEventLocation,
   type WebsiteEvent,
 } from '@/services/events.service';
 
@@ -147,8 +149,16 @@ export default function EventsPage() {
 
         // console.log('Events API Response:', data);
 
+        const listedEvents = Array.isArray(data) ? data : [];
+        const eventsWithLocations = await Promise.all(
+          listedEvents.map(async (event) => {
+            const location = await resolveWebsiteEventLocation(event);
+            return location ? { ...event, location } : event;
+          }),
+        );
+
         if (isMounted) {
-          setEvents(Array.isArray(data) ? data : []);
+          setEvents(eventsWithLocations);
         }
       } catch (error) {
         // console.error('Failed to load events:', error);
@@ -230,9 +240,7 @@ export default function EventsPage() {
 
                 const date = formatDate(item.startDate ?? item.startsAt);
 
-                const location = String(
-                  item.location ?? item.venue ?? item.city ?? 'Location to be announced',
-                );
+                const location = getWebsiteEventLocation(item) ?? 'Location to be announced';
 
                 const description = String(
                   item.excerpt ??

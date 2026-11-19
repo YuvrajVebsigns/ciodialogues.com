@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Play, Quote, User, ArrowUpRight } from 'lucide-react';
+
+import { fetchDialogues, type DialogueItem } from '@/services/dialogue-page.service';
 
 interface VideoItem {
   id: number;
@@ -16,25 +18,44 @@ interface VideoItem {
   image?: string;
 }
 
-interface DialogueItem {
-  id: number;
-  slug: string;
-  quote: string;
-  author: string;
-  role: string;
-  avatar: string;
-}
-
 interface VideoDialoguesShowcaseProps {
   videos: VideoItem[];
   dialogues: DialogueItem[];
 }
 
+const EMPTY_DIALOGUES: DialogueItem[] = [];
+
 export default function VideoDialoguesShowcase({
   videos = [],
-  dialogues = [],
+  dialogues = EMPTY_DIALOGUES,
 }: VideoDialoguesShowcaseProps) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [dialogueItems, setDialogueItems] = useState(dialogues);
+  const [dialoguesLoadError, setDialoguesLoadError] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadDialogues() {
+      try {
+        const mappedDialogues = await fetchDialogues(dialogues);
+
+        if (isMounted && mappedDialogues.length > 0) {
+          setDialogueItems(mappedDialogues);
+        }
+      } catch {
+        if (isMounted) {
+          setDialoguesLoadError(true);
+        }
+      }
+    }
+
+    void loadDialogues();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dialogues]);
 
   // Take the first video as main featured
   const featuredVideo = videos[0] || {
@@ -48,7 +69,7 @@ export default function VideoDialoguesShowcase({
   };
 
   // Limit dialogues to 4 items for a clean 2x2 grid
-  const displayDialogues = dialogues.slice(0, 4);
+  const displayDialogues = dialogueItems.slice(0, 4);
 
   // Fallback video cover image
   const videoCoverImage = '/assets/blogs/blog-1.webp';
@@ -125,6 +146,12 @@ export default function VideoDialoguesShowcase({
               <ArrowUpRight size={14} />
             </Link>
           </div>
+
+          <p className="sr-only" role="status" aria-live="polite">
+            {dialoguesLoadError
+              ? 'Live dialogues could not be loaded. Showing saved dialogues.'
+              : ''}
+          </p>
 
           <div className="video-dialogues-showcase__dialogues-grid">
             {displayDialogues.map((item) => (

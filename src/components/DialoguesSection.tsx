@@ -2,11 +2,12 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
 import useScrollAnimation from '@/hooks/useScrollAnimation';
+import { fetchDialogues, type DialogueItem } from '@/services/dialogue-page.service';
 
-const dialogues = [
+const STATIC_DIALOGUES: DialogueItem[] = [
   {
     id: 1,
     slug: 'arpanarghya-saha-nimf-digital-first',
@@ -111,6 +112,8 @@ const dialogues = [
 export default function OurDialogues() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  const [dialogues, setDialogues] = useState<DialogueItem[]>(STATIC_DIALOGUES);
+  const [dialoguesLoadError, setDialoguesLoadError] = useState(false);
 
   const headingRef = useScrollAnimation<HTMLDivElement>({
     animationClass: 'animate-fade-in-left',
@@ -123,6 +126,25 @@ export default function OurDialogues() {
     initialTransform: 'translateY(24px)',
     threshold: 0.1,
   });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadDialogues() {
+      try {
+        const items = await fetchDialogues(STATIC_DIALOGUES);
+        if (isMounted) setDialogues(items);
+      } catch {
+        if (isMounted) setDialoguesLoadError(true);
+      }
+    }
+
+    void loadDialogues();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const scrollByCard = (direction: number) => {
     const el = containerRef.current;
@@ -154,6 +176,10 @@ export default function OurDialogues() {
             Our <span>Dialogues</span>
           </h2>
         </div>
+
+        <p className="sr-only" role="status" aria-live="polite">
+          {dialoguesLoadError ? 'Live dialogues could not be loaded. Showing saved dialogues.' : ''}
+        </p>
 
         <div className="dialogues-controls">
           <button aria-label="Previous" className="dialogues-nav" onClick={() => scrollByCard(-1)}>

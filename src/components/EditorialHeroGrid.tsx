@@ -433,7 +433,7 @@ export default function EditorialHeroGrid() {
                       href={`/blog/${featured.slug}`}
                       className="editorial-hero-grid__read-more"
                     >
-                      Read Full Story
+                      Read More
                       <ArrowRight size={16} />
                     </Link>
                   </div>

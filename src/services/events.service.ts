@@ -136,6 +136,43 @@ function normalizeEventsResponse(res: unknown): WebsiteEvent[] {
   return items.map((item) => normalizeEvent(item as RawEvent));
 }
 
+export function getWebsiteEventLocation(event: WebsiteEvent): string | undefined {
+  const records: Record<string, unknown>[] = [event];
+
+  const getLocationString = (value: unknown) => {
+    if (typeof value !== 'string') return undefined;
+
+    const location = value.trim();
+    return location && location.toLowerCase() !== 'location to be announced' ? location : undefined;
+  };
+
+  for (const key of ['data', 'event', 'details']) {
+    const nested = event[key];
+    if (isRecord(nested)) records.push(nested);
+  }
+
+  for (const record of records) {
+    const location = record.location;
+
+    const directLocation = getLocationString(location);
+    if (directLocation) return directLocation;
+
+    if (isRecord(location)) {
+      for (const value of [location.venue, location.address, location.city, location.name]) {
+        const locationString = getLocationString(value);
+        if (locationString) return locationString;
+      }
+    }
+
+    for (const value of [record.venue, record.city, record.address, record.locationName]) {
+      const locationString = getLocationString(value);
+      if (locationString) return locationString;
+    }
+  }
+
+  return undefined;
+}
+
 export function readStoredWebsiteAuth(): WebsiteAuth | null {
   if (typeof window === 'undefined') return null;
 
@@ -297,4 +334,17 @@ export async function fetchWebsiteEventByIdOrSlug(idOrSlug: string): Promise<Web
   } catch {
     return null;
   }
+}
+
+export async function resolveWebsiteEventLocation(
+  event: WebsiteEvent,
+): Promise<string | undefined> {
+  const location = getWebsiteEventLocation(event);
+  if (location) return location;
+
+  const idOrSlug = event.slug?.trim() || event.id;
+  if (!idOrSlug) return undefined;
+
+  const details = await fetchWebsiteEventByIdOrSlug(idOrSlug);
+  return details ? getWebsiteEventLocation(details) : undefined;
 }

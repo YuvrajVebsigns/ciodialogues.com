@@ -7,7 +7,9 @@ import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
 import {
   FALLBACK_WEBSITE_EVENT_IMAGE,
   fetchWebsiteEvents,
+  getWebsiteEventLocation,
   getWebsiteEventImage,
+  resolveWebsiteEventLocation,
   type WebsiteEvent,
 } from '@/services/events.service';
 
@@ -72,7 +74,7 @@ function extractImageUrl(value: unknown): string {
   return '';
 }
 
-// Get the actual event image from different possible API fields.
+// Get event image from backend response.
 function getEventImage(item: WebsiteEvent): string {
   const event = item as Record<string, unknown>;
 
@@ -96,20 +98,14 @@ function getEventImage(item: WebsiteEvent): string {
   for (const field of imageFields) {
     const imageUrl = extractImageUrl(event[field]);
 
-    if (imageUrl) {
-      // console.log(`Event image found (${field}):`, imageUrl);
-      return imageUrl;
-    }
+    if (imageUrl) return imageUrl;
   }
 
-  // Try the existing service helper as a final fallback.
   const serviceImage = getWebsiteEventImage(item);
 
   if (serviceImage && serviceImage !== FALLBACK_WEBSITE_EVENT_IMAGE) {
     return serviceImage;
   }
-
-  // console.warn('No backend image found for event:', item);
 
   return FALLBACK_WEBSITE_EVENT_IMAGE;
 }
@@ -125,10 +121,16 @@ export default function UpcomingEventsGrid() {
       try {
         const data = await fetchWebsiteEvents();
 
-        // console.log('Events API Response:', data);
+        const listedEvents = Array.isArray(data) ? data : [];
+        const displayedEvents = await Promise.all(
+          listedEvents.slice(0, 3).map(async (event) => {
+            const location = await resolveWebsiteEventLocation(event);
+            return location ? { ...event, location } : event;
+          }),
+        );
 
         if (isMounted) {
-          setEvents(Array.isArray(data) ? data : []);
+          setEvents([...displayedEvents, ...listedEvents.slice(3)]);
         }
       } catch (error) {
         // console.error('Failed to load events:', error);
@@ -206,9 +208,8 @@ export default function UpcomingEventsGrid() {
 
             const date = formatDate(item.startDate ?? item.startsAt);
 
-            const location = String(
-              item.location ?? item.venue ?? item.city ?? 'Location to be announced',
-            );
+            // Dynamic location from backend.
+            const location = getWebsiteEventLocation(item) ?? 'Location to be announced';
 
             const description = String(
               item.excerpt ??
@@ -235,8 +236,6 @@ export default function UpcomingEventsGrid() {
                     loading="lazy"
                     onError={(event) => {
                       const img = event.currentTarget;
-
-                      // console.error('Event image failed to load:', img.src);
 
                       if (!img.dataset.fallback && img.src !== FALLBACK_WEBSITE_EVENT_IMAGE) {
                         img.dataset.fallback = 'true';
