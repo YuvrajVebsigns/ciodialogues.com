@@ -18191,6 +18191,10 @@ s .dialogues-badge-mark {
   z-index: 2;
 
   margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 
   color: var(--news-text);
 
@@ -18198,6 +18202,47 @@ s .dialogues-badge-mark {
   font-size: 16px;
   font-style: normal;
   line-height: 1.65;
+}
+
+.video-dialogues-showcase__quote-text.is-expanded {
+  display: block;
+  max-height: 8.25em;
+  padding-right: 8px;
+  -webkit-line-clamp: unset;
+  overflow-y: auto;
+  scrollbar-color: var(--news-red) #f3eaea;
+  scrollbar-width: thin;
+}
+
+.video-dialogues-showcase__quote-text.is-expanded::-webkit-scrollbar {
+  width: 5px;
+}
+
+.video-dialogues-showcase__quote-text.is-expanded::-webkit-scrollbar-track {
+  background: #f3eaea;
+}
+
+.video-dialogues-showcase__quote-text.is-expanded::-webkit-scrollbar-thumb {
+  background: var(--news-red);
+}
+
+.video-dialogues-showcase__quote-toggle {
+  display: inline-flex;
+  margin-top: 8px;
+  padding: 0;
+  color: var(--news-red);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.video-dialogues-showcase__quote-toggle:hover {
+  text-decoration: underline;
 }
 
 /* =========================================================

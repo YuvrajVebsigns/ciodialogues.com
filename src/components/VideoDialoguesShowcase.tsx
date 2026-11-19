@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Play, Quote, User, ArrowUpRight } from 'lucide-react';
@@ -24,6 +24,75 @@ interface VideoDialoguesShowcaseProps {
 }
 
 const EMPTY_DIALOGUES: DialogueItem[] = [];
+
+function DialogueCard({ item }: { item: DialogueItem }) {
+  const quoteRef = useRef<HTMLParagraphElement>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [hasOverflow, setHasOverflow] = useState(false);
+
+  useEffect(() => {
+    const quote = quoteRef.current;
+    if (!quote || isExpanded) return;
+
+    const checkOverflow = () => {
+      setHasOverflow(quote.scrollHeight > quote.clientHeight + 1);
+    };
+
+    checkOverflow();
+    const observer = new ResizeObserver(checkOverflow);
+    observer.observe(quote);
+
+    return () => observer.disconnect();
+  }, [isExpanded, item.quote]);
+
+  return (
+    <div className="video-dialogues-showcase__dialogue-card">
+      <div className="relative">
+        <div className="video-dialogues-showcase__quote-icon">
+          <Quote
+            size={28}
+            fill="currentColor"
+            className="video-dialogues-showcase__quote-icon-svg"
+          />
+        </div>
+        <p
+          ref={quoteRef}
+          className={`video-dialogues-showcase__quote-text${isExpanded ? ' is-expanded' : ''}`}
+        >
+          &ldquo;{item.quote}&rdquo;
+        </p>
+        {hasOverflow && (
+          <button
+            type="button"
+            className="video-dialogues-showcase__quote-toggle"
+            aria-expanded={isExpanded}
+            onClick={() => setIsExpanded((expanded) => !expanded)}
+          >
+            {isExpanded ? 'Read Less' : 'Read More'}
+          </button>
+        )}
+      </div>
+
+      <div className="video-dialogues-showcase__dialogue-footer">
+        <div className="video-dialogues-showcase__avatar-wrapper">
+          <Image
+            src={item.avatar}
+            alt={item.author}
+            fill
+            className="video-dialogues-showcase__avatar-image"
+            unoptimized
+          />
+        </div>
+        <div className="overflow-hidden">
+          <h5 className="video-dialogues-showcase__dialogue-author">{item.author}</h5>
+          <p className="video-dialogues-showcase__dialogue-role" title={item.role}>
+            {item.role}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function VideoDialoguesShowcase({
   videos = [],
@@ -155,36 +224,7 @@ export default function VideoDialoguesShowcase({
 
           <div className="video-dialogues-showcase__dialogues-grid">
             {displayDialogues.map((item) => (
-              <div key={item.id} className="video-dialogues-showcase__dialogue-card">
-                <div className="relative">
-                  <div className="video-dialogues-showcase__quote-icon">
-                    <Quote
-                      size={28}
-                      fill="currentColor"
-                      className="video-dialogues-showcase__quote-icon-svg"
-                    />
-                  </div>
-                  <p className="video-dialogues-showcase__quote-text">&ldquo;{item.quote}&rdquo;</p>
-                </div>
-
-                <div className="video-dialogues-showcase__dialogue-footer">
-                  <div className="video-dialogues-showcase__avatar-wrapper">
-                    <Image
-                      src={item.avatar}
-                      alt={item.author}
-                      fill
-                      className="video-dialogues-showcase__avatar-image"
-                      unoptimized
-                    />
-                  </div>
-                  <div className="overflow-hidden">
-                    <h5 className="video-dialogues-showcase__dialogue-author">{item.author}</h5>
-                    <p className="video-dialogues-showcase__dialogue-role" title={item.role}>
-                      {item.role}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <DialogueCard key={item.id} item={item} />
             ))}
 
             {displayDialogues.length === 0 && (

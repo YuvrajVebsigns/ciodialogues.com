@@ -218,6 +218,7 @@ function AnimatedDialogueCard({
           width={65}
           height={65}
           className="dialogue-avatar"
+          unoptimized
         />
 
         <div>
