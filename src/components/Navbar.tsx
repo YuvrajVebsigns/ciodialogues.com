@@ -168,11 +168,11 @@ const AD_MESSAGES = [
 
 const otherServiceLinks = [
   {
-    label: 'Event',
+    label: 'Events',
     href: '/events',
   },
   {
-    label: 'Blog',
+    label: 'Blogs',
     href: '/blog',
   },
   {
