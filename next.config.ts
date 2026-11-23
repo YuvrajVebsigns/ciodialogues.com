@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  deploymentId: process.env.NEXT_DEPLOYMENT_ID,
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'cioangelnetwork.com' },
