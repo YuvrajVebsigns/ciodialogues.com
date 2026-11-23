@@ -200,7 +200,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Calendar, User } from 'lucide-react';
+import { ArrowLeft, Calendar, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import {
   fetchWebsitePageBySlug,
@@ -214,6 +214,7 @@ type OurBrandPostDetail = {
   date: string;
   image: string;
   content: string;
+  images: string[];
 };
 
 const fallbackImage = '/assets/blogs/blog-1.webp';
@@ -253,16 +254,113 @@ function getValidImage(value?: string) {
   return fallbackImage;
 }
 
+function extractContentImages(content: string) {
+  const imageUrls: string[] = [];
+  const imageUrlPattern = /https?:\/\/[^\s<>"']+/gi;
+  let cleanedContent = '';
+  let cursor = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = imageUrlPattern.exec(content)) !== null) {
+    const url = match[0].replace(/[.,;!?)}\]]+$/, '');
+
+    if (!/\.(?:avif|gif|jpe?g|png|svg|webp)(?:[?#].*)?$/i.test(url)) {
+      continue;
+    }
+
+    let prefix = content.slice(cursor, match.index);
+    const marker = prefix.match(/\d+\.\s*$/);
+
+    if (marker) {
+      const beforeMarker = prefix.slice(0, marker.index);
+
+      if (!beforeMarker || /(?:\.|\n)$/.test(beforeMarker)) {
+        prefix = beforeMarker;
+      }
+    }
+
+    cleanedContent += prefix;
+    imageUrls.push(url);
+    cursor = match.index + match[0].length;
+
+    const followingMarker = content.slice(cursor).match(/^\s+\d+\.(?=\s*(?:https?:\/\/|$))/i);
+
+    if (followingMarker) {
+      cursor += followingMarker[0].length;
+    }
+  }
+
+  cleanedContent += content.slice(cursor);
+
+  return {
+    content: cleanedContent
+      .replace(/[ \t]+/g, ' ')
+      .replace(/\s*\n\s*/g, '\n')
+      .trim(),
+    images: imageUrls,
+  };
+}
+
 function testimonialToDetail(item: PageTestimonial): OurBrandPostDetail {
   const meta = getRoleMeta(item.role || '');
+  const { content, images } = extractContentImages(item.quote || '');
 
   return {
     title: item.author || 'Our Brand',
     author: meta.author,
     date: meta.date,
     image: getValidImage(item.avatar),
-    content: item.quote || '',
+    content,
+    images,
   };
+}
+
+function BrandImageCarousel({ images, title }: { images: string[]; title: string }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  if (images.length === 0) return null;
+
+  const activeImage = images[activeIndex];
+
+  if (!activeImage) return null;
+
+  const showControls = images.length > 1;
+
+  return (
+    <div className="brand-image-carousel" aria-label={`${title} images`}>
+      <div className="brand-image-carousel__frame">
+        <Image
+          src={activeImage}
+          alt={`${title} image ${activeIndex + 1} of ${images.length}`}
+          fill
+          unoptimized
+          sizes="(max-width: 768px) 100vw, 1100px"
+        />
+      </div>
+
+      {showControls ? (
+        <div className="brand-image-carousel__controls">
+          <button
+            type="button"
+            aria-label="Previous image"
+            onClick={() => setActiveIndex((index) => (index - 1 + images.length) % images.length)}
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <span aria-live="polite">
+            {activeIndex + 1} / {images.length}
+          </span>
+          <button
+            type="button"
+            aria-label="Next image"
+            onClick={() => setActiveIndex((index) => (index + 1) % images.length)}
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 export default function OurBrandDetailPage() {
@@ -384,6 +482,7 @@ export default function OurBrandDetailPage() {
               .map((paragraph, index) => (
                 <p key={`${paragraph.slice(0, 20)}-${index}`}>{paragraph.trim()}</p>
               ))}
+            <BrandImageCarousel images={post.images} title={post.title} />
           </div>
         </article>
       </div>
