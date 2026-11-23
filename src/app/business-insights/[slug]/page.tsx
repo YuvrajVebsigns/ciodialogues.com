@@ -211,7 +211,8 @@ function generateSlug(text: string) {
     .replace(/&/g, 'and')
     .replace(/[^\w\s-]/g, '')
     .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
+    .replace(/-+/g, '-')
+    .slice(0, 100);
 }
 
 function getRoleMeta(role: string) {

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ArrowUpRight, Calendar } from 'lucide-react';
 
+import { extractImageUrl } from '@/lib/image-url';
 import { fetchWebsiteBlogs, type WebsiteBlogItem } from '@/services/blogs.service';
 
 import {
@@ -24,16 +25,6 @@ const channels = [
 const FALLBACK_EDITORIAL_IMAGE = '/assets/blogs/blog-1.webp';
 const MAX_THOUGHT_ITEMS = 1;
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.core-mediagroup.com';
-
-const BACKEND_ORIGIN = (() => {
-  try {
-    return new URL(API_BASE_URL).origin;
-  } catch {
-    return '';
-  }
-})();
-
 type ThoughtPost = {
   id: string;
   title: string;
@@ -51,70 +42,6 @@ type PressReleasePost = {
   excerpt: string;
   slug: string;
 };
-
-/* =========================================
-   IMAGE URL HANDLING
-========================================= */
-
-function extractImageUrl(value: unknown): string {
-  if (!value) return '';
-
-  if (typeof value === 'string') {
-    const trimmed = value.trim();
-
-    if (!trimmed || trimmed.toLowerCase() === 'null' || trimmed.toLowerCase() === 'undefined') {
-      return '';
-    }
-
-    if (/^https?:\/\//i.test(trimmed)) {
-      return trimmed;
-    }
-
-    if (trimmed.startsWith('//')) {
-      return `https:${trimmed}`;
-    }
-
-    if (trimmed.startsWith('/')) {
-      return BACKEND_ORIGIN ? `${BACKEND_ORIGIN}${trimmed}` : trimmed;
-    }
-
-    return BACKEND_ORIGIN ? `${BACKEND_ORIGIN}/${trimmed.replace(/^\/+/, '')}` : `/${trimmed}`;
-  }
-
-  if (typeof value === 'object' && value !== null) {
-    const record = value as Record<string, unknown>;
-
-    const fields = [
-      'url',
-      'src',
-      'path',
-      'imageUrl',
-      'secure_url',
-      'original',
-      'large',
-      'medium',
-      'thumbnail',
-    ];
-
-    for (const field of fields) {
-      const nestedValue = record[field];
-
-      if (nestedValue) {
-        const result = extractImageUrl(nestedValue);
-
-        if (result) return result;
-      }
-    }
-
-    if (record.urlVariants) {
-      const result = extractImageUrl(record.urlVariants);
-
-      if (result) return result;
-    }
-  }
-
-  return '';
-}
 
 function getValidImage(value: unknown): string {
   return extractImageUrl(value) || FALLBACK_EDITORIAL_IMAGE;
@@ -170,10 +97,6 @@ function formatDate(date?: string) {
     day: 'numeric',
     year: 'numeric',
   });
-}
-
-function getBlogCategory(blog: WebsiteBlogItem) {
-  return blog.websites?.[0]?.name || blog.tags?.[0] || 'Insight';
 }
 
 /* =========================================
@@ -507,10 +430,6 @@ export default function EditorialHeroGrid() {
               </div>
 
               <div>
-                <span className="editorial-hero-grid__trending-category">
-                  {getBlogCategory(blog)}
-                </span>
-
                 <h4 className="editorial-hero-grid__trending-title">
                   <Link href={`/blog/${blog.slug}`}>{blog.title}</Link>
                 </h4>

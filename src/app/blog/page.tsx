@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowUpRight, ChevronRight, ChevronLeft, Heart, MessageCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { extractImageUrl } from '@/lib/image-url';
 import {
   fetchWebsiteBlogs,
   submitWebsiteBlogLike,
@@ -12,16 +13,6 @@ import {
 } from '@/services/blogs.service';
 
 const FALLBACK_BLOG_IMAGE = '/assets/blogs/blog-1.webp';
-
-function isValidImageUrl(value?: string): value is string {
-  if (typeof value !== 'string') return false;
-
-  const trimmed = value.trim();
-  if (!trimmed) return false;
-  if (trimmed === 'null' || trimmed === 'undefined') return false;
-
-  return true;
-}
 
 function getBlogCategory(blog: WebsiteBlogItem) {
   return blog.websites?.[0]?.name || blog.tags?.[0] || 'Blog';
@@ -32,8 +23,9 @@ function getBlogAuthor(blog: WebsiteBlogItem) {
 }
 
 function getBlogImage(blog: WebsiteBlogItem) {
-  const candidate = blog.featureImage || blog.seo?.ogImage;
-  return isValidImageUrl(candidate) ? candidate : FALLBACK_BLOG_IMAGE;
+  return (
+    extractImageUrl(blog.featureImage) || extractImageUrl(blog.seo?.ogImage) || FALLBACK_BLOG_IMAGE
+  );
 }
 
 function getBlogDescription(blog: WebsiteBlogItem) {
@@ -161,10 +153,6 @@ function AnimatedBlogCard({ blog, index, variant = 'animate-fade-in' }: Animated
       </div>
 
       <div className="blogpage-content">
-        <div className="blogpage-meta">
-          <span className="blogpage-category">{getBlogCategory(blog)}</span>
-        </div>
-
         <h4 className="blogpage-heading blogpage-heading-fixed">{blog.title}</h4>
 
         <div className="blogpage-footer">

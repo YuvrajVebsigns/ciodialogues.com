@@ -305,7 +305,15 @@ export default function MainStoryPage() {
                 />
               </Link>
 
-              <p>{leadPost.excerpt}</p>
+              <p>
+                {leadPost.excerpt}{' '}
+                <Link
+                  href={`/main-story/${leadPost.slug}`}
+                  className="news-editorial-lead-read-more"
+                >
+                  Read More <span aria-hidden="true">→</span>
+                </Link>
+              </p>
             </article>
 
             {secondaryPosts.length > 0 && (
@@ -344,49 +352,6 @@ export default function MainStoryPage() {
                   </article>
                 ))}
               </div>
-            )}
-
-            {latestPosts.length > 0 && (
-              <section className="news-editorial-latest">
-                <div className="news-editorial-section-heading">
-                  <span />
-                  <h2>Latest Main Stories</h2>
-                  <span />
-                </div>
-
-                <div className="news-editorial-latest-grid">
-                  {latestPosts.map((post) => (
-                    <article key={post.id} className="news-editorial-latest-card">
-                      <Link
-                        href={`/main-story/${post.slug}`}
-                        className="news-editorial-latest-image"
-                      >
-                        <Image
-                          src={getImageSrc(post.id, post.image)}
-                          alt={post.title}
-                          fill
-                          sizes="(max-width: 800px) 100vw, 260px"
-                          unoptimized
-                          onError={() =>
-                            setImageErrors((prev) => ({
-                              ...prev,
-                              [post.id]: true,
-                            }))
-                          }
-                        />
-                      </Link>
-
-                      <span>{post.category}</span>
-
-                      <Link href={`/main-story/${post.slug}`}>
-                        <h3>{post.title}</h3>
-                      </Link>
-
-                      <p>{post.excerpt}</p>
-                    </article>
-                  ))}
-                </div>
-              </section>
             )}
           </section>
 
@@ -441,6 +406,46 @@ export default function MainStoryPage() {
               </div>
             </section>
           </aside>
+
+          {latestPosts.length > 0 && (
+            <section className="news-editorial-latest">
+              <div className="news-editorial-section-heading">
+                <span />
+                <h2>Latest Main Stories</h2>
+                <span />
+              </div>
+
+              <div className="news-editorial-latest-grid">
+                {latestPosts.map((post) => (
+                  <article key={post.id} className="news-editorial-latest-card">
+                    <Link href={`/main-story/${post.slug}`} className="news-editorial-latest-image">
+                      <Image
+                        src={getImageSrc(post.id, post.image)}
+                        alt={post.title}
+                        fill
+                        sizes="(max-width: 800px) 100vw, 260px"
+                        unoptimized
+                        onError={() =>
+                          setImageErrors((prev) => ({
+                            ...prev,
+                            [post.id]: true,
+                          }))
+                        }
+                      />
+                    </Link>
+
+                    <span>{post.category}</span>
+
+                    <Link href={`/main-story/${post.slug}`}>
+                      <h3>{post.title}</h3>
+                    </Link>
+
+                    <p>{post.excerpt}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       )}
     </main>

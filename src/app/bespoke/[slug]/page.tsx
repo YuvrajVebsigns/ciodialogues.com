@@ -19,6 +19,15 @@ type BespokePostDetail = {
   content: string;
 };
 
+type EmbeddedMedia = {
+  type: 'youtube' | 'image' | 'pdf';
+  src: string;
+};
+
+type ContentSegment =
+  | { type: 'text'; text: string }
+  | { type: 'media'; media: EmbeddedMedia; caption: string };
+
 const fallbackImage = '/assets/blogs/blog-1.webp';
 
 function generateSlug(text: string) {
@@ -66,6 +75,154 @@ function testimonialToDetail(item: PageTestimonial): BespokePostDetail {
     image: getValidImage(item.avatar),
     content: item.quote || '',
   };
+}
+
+function getEmbeddedMedia(value: string): EmbeddedMedia | null {
+  const normalizedValue = value.replace(/&amp;/gi, '&');
+  const urlValue = /^www\./i.test(normalizedValue) ? `https://${normalizedValue}` : normalizedValue;
+
+  let url: URL;
+  try {
+    url = new URL(urlValue);
+  } catch {
+    return null;
+  }
+
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
+
+  const hostname = url.hostname.toLowerCase();
+  const youtubeHosts = new Set([
+    'youtube.com',
+    'www.youtube.com',
+    'm.youtube.com',
+    'youtu.be',
+    'youtube-nocookie.com',
+    'www.youtube-nocookie.com',
+  ]);
+
+  if (youtubeHosts.has(hostname)) {
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    const videoId =
+      hostname === 'youtu.be'
+        ? pathParts[0]
+        : url.pathname === '/watch'
+          ? url.searchParams.get('v')
+          : ['embed', 'shorts', 'live'].includes(pathParts[0] ?? '')
+            ? pathParts[1]
+            : undefined;
+
+    return videoId && /^[\w-]{11}$/.test(videoId)
+      ? { type: 'youtube', src: `https://www.youtube-nocookie.com/embed/${videoId}` }
+      : null;
+  }
+
+  if (/\.pdf$/i.test(url.pathname)) {
+    return { type: 'pdf', src: url.href };
+  }
+
+  if (/\.(?:avif|bmp|gif|jpe?g|png|svg|webp)$/i.test(url.pathname)) {
+    return { type: 'image', src: url.href };
+  }
+
+  return null;
+}
+
+function getMediaCaption(value: string) {
+  const lines = value.trim().split(/\r?\n/);
+  const lastLine = lines[lines.length - 1]?.trim() ?? '';
+  const watchIndex = lastLine.toLowerCase().lastIndexOf('watch');
+
+  if (watchIndex >= 0 && /^watch\s*:/i.test(lastLine.slice(watchIndex))) {
+    return lastLine
+      .slice(watchIndex)
+      .replace(/^watch\s*:\s*/i, '')
+      .trim();
+  }
+
+  return lastLine;
+}
+
+function parseContentSegments(content: string): ContentSegment[] {
+  const normalizedContent = content.replace(/&amp;/gi, '&');
+  const urlPattern = /(?:https?:\/\/|www\.)[^\s<>"']+/gi;
+  const segments: ContentSegment[] = [];
+  let cursor = 0;
+  let pendingText = '';
+  let match: RegExpExecArray | null;
+
+  while ((match = urlPattern.exec(normalizedContent)) !== null) {
+    pendingText += normalizedContent.slice(cursor, match.index);
+
+    const trailingPunctuation = match[0].match(/[.,;:!?)}\]]+$/)?.[0] ?? '';
+    const urlValue = match[0].slice(0, match[0].length - trailingPunctuation.length);
+    const media = getEmbeddedMedia(urlValue);
+
+    if (media) {
+      segments.push({
+        type: 'media',
+        media,
+        caption: getMediaCaption(pendingText),
+      });
+      pendingText = '';
+    } else {
+      pendingText += trailingPunctuation;
+    }
+
+    cursor = match.index + match[0].length;
+  }
+
+  pendingText += normalizedContent.slice(cursor);
+
+  if (pendingText.trim()) {
+    segments.push({ type: 'text', text: pendingText.trim() });
+  }
+
+  return segments;
+}
+
+function renderContentSegment(segment: ContentSegment, key: string) {
+  if (segment.type === 'text') {
+    return <p key={key}>{segment.text}</p>;
+  }
+
+  const mediaTitle = segment.caption || 'Bespoke resource';
+
+  return (
+    <article
+      key={key}
+      className={`bespoke-content-media-card bespoke-content-media-card--${segment.media.type}`}
+    >
+      {segment.caption ? <p className="bespoke-content-media-caption">{segment.caption}</p> : null}
+
+      {segment.media.type === 'youtube' ? (
+        <iframe
+          className="bespoke-content-media-frame bespoke-content-media-frame--video"
+          src={segment.media.src}
+          title={segment.caption || 'Bespoke video'}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      ) : segment.media.type === 'pdf' ? (
+        <iframe
+          className="bespoke-content-media-frame bespoke-content-media-frame--pdf"
+          src={segment.media.src}
+          title={`${mediaTitle} PDF`}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+        />
+      ) : (
+        <Image
+          className="bespoke-content-media-image"
+          src={segment.media.src}
+          alt={segment.caption || 'Bespoke resource'}
+          width={1200}
+          height={675}
+          unoptimized
+        />
+      )}
+    </article>
+  );
 }
 
 export default function BespokeDetailPage() {
@@ -185,9 +342,11 @@ export default function BespokeDetailPage() {
             {post.content
               .split(/\n\s*\n/)
               .filter((paragraph) => paragraph.trim())
-              .map((paragraph, index) => (
-                <p key={`${paragraph.slice(0, 20)}-${index}`}>{paragraph.trim()}</p>
-              ))}
+              .map((paragraph, index) =>
+                parseContentSegments(paragraph).map((segment, segmentIndex) =>
+                  renderContentSegment(segment, `${index}-${segmentIndex}`),
+                ),
+              )}
           </div>
         </article>
       </div>

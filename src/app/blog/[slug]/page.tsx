@@ -7,6 +7,7 @@ import { ArrowUpLeft, ArrowUpRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import useScrollAnimation from '../../../hooks/useScrollAnimation';
 import BlogCommentsPanel from '@/components/BlogCommentsPanel';
+import { extractImageUrl } from '@/lib/image-url';
 import {
   fetchWebsiteBlogBySlug,
   type WebsiteBlogContentBlock,
@@ -47,11 +48,11 @@ function formatPublishedDate(value?: string) {
 }
 
 function getBlogImage(blog?: WebsiteBlogDetailItem | null) {
-  return blog?.featureImage || blog?.seo?.ogImage || '/assets/blogs/blog-1.webp';
-}
-
-function getBlogCategory(blog?: WebsiteBlogDetailItem | null) {
-  return blog?.websites?.[0]?.name || blog?.tags?.[0] || 'Blog';
+  return (
+    extractImageUrl(blog?.featureImage) ||
+    extractImageUrl(blog?.seo?.ogImage) ||
+    '/assets/blogs/blog-1.webp'
+  );
 }
 
 function getBlogContentBlocks(blog?: WebsiteBlogDetailItem | null) {
@@ -243,7 +244,6 @@ export default function BlogDetailsPage() {
   }
 
   const displayTitle = blog.title;
-  const displayCategory = getBlogCategory(blog);
   const displayDate = formatPublishedDate(blog.publishedAt);
   // const displayImage = getBlogImage(blog);
   const contentBlocks = getBlogContentBlocks(blog);
@@ -325,10 +325,6 @@ export default function BlogDetailsPage() {
             animationClass="animate-fade-in-left"
             initialTransform="translateX(-24px)"
           >
-            <div className="blogpage-meta">
-              <span className="blogpage-category">{displayCategory}</span>
-            </div>
-
             <h1 className="blogpage-title">{displayTitle}</h1>
 
             {displayDate ? (

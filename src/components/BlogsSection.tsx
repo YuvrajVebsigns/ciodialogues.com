@@ -5,18 +5,19 @@ import Link from 'next/link';
 import { ArrowUpRight, Heart, MessageCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { extractImageUrl } from '@/lib/image-url';
 import {
   fetchWebsiteBlogs,
   submitWebsiteBlogLike,
   type WebsiteBlogItem,
 } from '@/services/blogs.service';
 
-function getBlogCategory(blog: WebsiteBlogItem) {
-  return blog.websites?.[0]?.name || blog.tags?.[0] || 'Blog';
-}
-
 function getBlogImage(blog: WebsiteBlogItem) {
-  return blog.featureImage || blog.seo?.ogImage || '/assets/blogs/blog-1.png';
+  return (
+    extractImageUrl(blog.featureImage) ||
+    extractImageUrl(blog.seo?.ogImage) ||
+    '/assets/blogs/blog-1.png'
+  );
 }
 
 export default function BlogsSection() {
@@ -231,10 +232,6 @@ export default function BlogsSection() {
                 </div>
 
                 <div className="blog-content">
-                  <div className="blog-meta">
-                    <span className="blog-category">{getBlogCategory(blog)}</span>
-                  </div>
-
                   <h4 className="blog-heading blog-heading-fixed">{blog.title}</h4>
 
                   <div className="blogpage-footer">

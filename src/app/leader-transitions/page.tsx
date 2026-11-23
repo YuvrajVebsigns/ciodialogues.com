@@ -297,7 +297,15 @@ export default function LeaderTransitionsPage() {
                 />
               </Link>
 
-              <p>{leadPost.excerpt}</p>
+              <p>
+                {leadPost.excerpt}{' '}
+                <Link
+                  href={`/leader-transitions/${leadPost.slug}`}
+                  className="news-editorial-lead-read-more"
+                >
+                  Read More <span aria-hidden="true">→</span>
+                </Link>
+              </p>
             </article>
 
             {secondaryPosts.length > 0 && (
@@ -330,43 +338,6 @@ export default function LeaderTransitionsPage() {
                   </article>
                 ))}
               </div>
-            )}
-
-            {latestPosts.length > 0 && (
-              <section className="news-editorial-latest">
-                <div className="news-editorial-section-heading">
-                  <span />
-                  <h2>Latest Leader Transitions</h2>
-                  <span />
-                </div>
-
-                <div className="news-editorial-latest-grid">
-                  {latestPosts.map((post) => (
-                    <article key={post.id} className="news-editorial-latest-card">
-                      <Link
-                        href={`/leader-transitions/${post.slug}`}
-                        className="news-editorial-latest-image"
-                      >
-                        <Image
-                          src={post.image}
-                          alt={post.title}
-                          fill
-                          sizes="(max-width: 600px) 100vw, 310px"
-                          unoptimized
-                        />
-                      </Link>
-
-                      <span>{post.category}</span>
-
-                      <Link href={`/leader-transitions/${post.slug}`}>
-                        <h3>{post.title}</h3>
-                      </Link>
-
-                      <p>{post.excerpt}</p>
-                    </article>
-                  ))}
-                </div>
-              </section>
             )}
           </section>
 
@@ -422,6 +393,43 @@ export default function LeaderTransitionsPage() {
               </div>
             </section>
           </aside>
+
+          {latestPosts.length > 0 && (
+            <section className="news-editorial-latest">
+              <div className="news-editorial-section-heading">
+                <span />
+                <h2>Latest CIO Transitions</h2>
+                <span />
+              </div>
+
+              <div className="news-editorial-latest-grid">
+                {latestPosts.map((post) => (
+                  <article key={post.id} className="news-editorial-latest-card">
+                    <Link
+                      href={`/leader-transitions/${post.slug}`}
+                      className="news-editorial-latest-image"
+                    >
+                      <Image
+                        src={post.image}
+                        alt={post.title}
+                        fill
+                        sizes="(max-width: 600px) 100vw, 310px"
+                        unoptimized
+                      />
+                    </Link>
+
+                    <span>{post.category}</span>
+
+                    <Link href={`/leader-transitions/${post.slug}`}>
+                      <h3>{post.title}</h3>
+                    </Link>
+
+                    <p>{post.excerpt}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       )}
     </main>

@@ -14,12 +14,22 @@ export interface WebsiteBlogAuthor {
   id: string;
 }
 
+export interface WebsiteBlogImageVariants {
+  original?: string;
+  thumbnail?: string;
+  small?: string;
+  medium?: string;
+  large?: string;
+}
+
+export type WebsiteBlogImage = string | WebsiteBlogImageVariants | null;
+
 export interface WebsiteBlogItem {
   id: string;
   slug: string;
   title: string;
   excerpt?: string;
-  featureImage?: string;
+  featureImage?: WebsiteBlogImage;
   featureImageId?: string | null;
   websites?: WebsiteBlogWebsite[];
   author?: WebsiteBlogAuthor;
@@ -31,7 +41,7 @@ export interface WebsiteBlogItem {
     metaTitle?: string;
     metaDescription?: string;
     keywords?: string[];
-    ogImage?: string;
+    ogImage?: WebsiteBlogImage;
     ogImageId?: string | null;
   };
   engagement?: {

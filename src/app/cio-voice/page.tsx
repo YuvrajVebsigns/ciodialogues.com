@@ -198,7 +198,7 @@ export default function CIOVoicePage() {
   const latestPosts = filteredPosts.slice(3);
 
   return (
-    <main className="news-editorial-page">
+    <main className="news-editorial-page cio-voice-editorial-page">
       {isLoading ? (
         <section className="news-editorial-status">
           <h2>Loading stories...</h2>
@@ -306,7 +306,15 @@ export default function CIOVoicePage() {
                 />
               </Link>
 
-              <p>{leadPost.excerpt}</p>
+              <p>
+                {leadPost.excerpt}{' '}
+                <Link
+                  href={`/cio-voice/${leadPost.slug}`}
+                  className="news-editorial-lead-read-more"
+                >
+                  Read More <span aria-hidden="true">→</span>
+                </Link>
+              </p>
             </article>
 
             {secondaryPosts.length > 0 && (
@@ -353,54 +361,6 @@ export default function CIOVoicePage() {
                   </article>
                 ))}
               </div>
-            )}
-
-            {latestPosts.length > 0 && (
-              <section className="news-editorial-latest">
-                <div className="news-editorial-section-heading">
-                  <span />
-                  <h2>Latest Stories</h2>
-                  <span />
-                </div>
-
-                <div className="news-editorial-latest-grid">
-                  {latestPosts.map((post) => (
-                    <article key={post.id} className="news-editorial-latest-card">
-                      <Link
-                        href={`/cio-voice/${post.slug}`}
-                        className="news-editorial-latest-image"
-                      >
-                        <Image
-                          src={getImageSrc(post.id, post.image)}
-                          alt={post.title}
-                          fill
-                          sizes="(max-width: 600px) 100vw, 310px"
-                          unoptimized
-                          onError={() =>
-                            setImageErrors((prev) => ({
-                              ...prev,
-                              [post.id]: true,
-                            }))
-                          }
-                        />
-                      </Link>
-
-                      <div className="news-editorial-latest-meta">
-                        <small>
-                          {post.author}
-                          {post.date ? ` · ${post.date}` : ''}
-                        </small>
-                      </div>
-
-                      <Link href={`/cio-voice/${post.slug}`}>
-                        <h3>{post.title}</h3>
-                      </Link>
-
-                      <p>{post.excerpt}</p>
-                    </article>
-                  ))}
-                </div>
-              </section>
             )}
           </section>
 
@@ -451,6 +411,51 @@ export default function CIOVoicePage() {
               </div>
             </section>
           </aside>
+
+          {latestPosts.length > 0 && (
+            <section className="news-editorial-latest">
+              <div className="news-editorial-section-heading">
+                <span />
+                <h2>Latest Stories</h2>
+                <span />
+              </div>
+
+              <div className="news-editorial-latest-grid">
+                {latestPosts.map((post) => (
+                  <article key={post.id} className="news-editorial-latest-card">
+                    <Link href={`/cio-voice/${post.slug}`} className="news-editorial-latest-image">
+                      <Image
+                        src={getImageSrc(post.id, post.image)}
+                        alt={post.title}
+                        fill
+                        sizes="(max-width: 600px) 100vw, 310px"
+                        unoptimized
+                        onError={() =>
+                          setImageErrors((prev) => ({
+                            ...prev,
+                            [post.id]: true,
+                          }))
+                        }
+                      />
+                    </Link>
+
+                    <div className="news-editorial-latest-meta">
+                      <small>
+                        {post.author}
+                        {post.date ? ` · ${post.date}` : ''}
+                      </small>
+                    </div>
+
+                    <Link href={`/cio-voice/${post.slug}`}>
+                      <h3>{post.title}</h3>
+                    </Link>
+
+                    <p>{post.excerpt}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       )}
     </main>
