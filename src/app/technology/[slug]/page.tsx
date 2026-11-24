@@ -187,7 +187,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, User } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import {
@@ -202,7 +202,17 @@ type PostDetail = {
   date: string;
   image: string;
   content: string;
+  images: string[];
 };
+
+type EmbeddedMedia = {
+  type: 'youtube' | 'image' | 'pdf';
+  src: string;
+};
+
+type ContentSegment =
+  | { type: 'text'; text: string }
+  | { type: 'media'; media: EmbeddedMedia; caption: string };
 
 const fallbackImage = '/assets/blogs/blog-1.webp';
 
@@ -224,6 +234,20 @@ function getRoleMeta(role = '') {
     .map((item) => item.trim())
     .filter(Boolean);
 
+  if (parts.length === 1) {
+    const dateMatch = parts[0]?.match(
+      /(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}/i,
+    );
+    if (dateMatch?.[0]) {
+      const date = dateMatch[0];
+      const author = (parts[0] ?? '')
+        .replace(date, '')
+        .replace(/[-–—,]\s*$/, '')
+        .trim();
+      return { author: author || 'CIO Dialogues Team', date };
+    }
+  }
+
   return {
     author: parts[0] || 'CIO Dialogues Team',
     date: parts[1] || '',
@@ -244,14 +268,242 @@ function getValidImage(value?: string) {
 
 function testimonialToPost(item: PageTestimonial): PostDetail {
   const meta = getRoleMeta(item.role);
+  const { content, images } = extractContentImages(item.quote || '');
 
   return {
     title: item.author || 'Technology',
     author: meta.author,
     date: meta.date,
     image: getValidImage(item.avatar),
-    content: item.quote || '',
+    content,
+    images,
   };
+}
+
+function extractContentImages(content: string) {
+  const images: string[] = [];
+  const urlPattern = /(?:https?:\/\/|www\.)[^\s<>"']+/gi;
+  let cleanedContent = '';
+  let cursor = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = urlPattern.exec(content)) !== null) {
+    const trailingPunctuation = match[0].match(/[.,;:!?)}\]]+$/)?.[0] ?? '';
+    const url = match[0].slice(0, match[0].length - trailingPunctuation.length);
+    const normalizedUrl = /^www\./i.test(url) ? `https://${url}` : url;
+
+    if (!/\.(?:avif|bmp|gif|jpe?g|png|svg|webp)(?:[?#].*)?$/i.test(normalizedUrl)) {
+      continue;
+    }
+
+    cleanedContent += content.slice(cursor, match.index);
+    images.push(normalizedUrl);
+    cursor = match.index + match[0].length;
+  }
+
+  cleanedContent += content.slice(cursor);
+
+  return {
+    content: cleanedContent
+      .replace(/[ \t]+/g, ' ')
+      .replace(/\s*\n\s*/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim(),
+    images,
+  };
+}
+
+function getEmbeddedMedia(value: string): EmbeddedMedia | null {
+  const normalizedValue = value.replace(/&amp;/gi, '&');
+  const urlValue = /^www\./i.test(normalizedValue) ? `https://${normalizedValue}` : normalizedValue;
+
+  let url: URL;
+  try {
+    url = new URL(urlValue);
+  } catch {
+    return null;
+  }
+
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
+
+  const hostname = url.hostname.toLowerCase();
+  const youtubeHosts = new Set([
+    'youtube.com',
+    'www.youtube.com',
+    'm.youtube.com',
+    'youtu.be',
+    'youtube-nocookie.com',
+    'www.youtube-nocookie.com',
+  ]);
+
+  if (youtubeHosts.has(hostname)) {
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    const videoId =
+      hostname === 'youtu.be'
+        ? pathParts[0]
+        : url.pathname === '/watch'
+          ? url.searchParams.get('v')
+          : ['embed', 'shorts', 'live'].includes(pathParts[0] ?? '')
+            ? pathParts[1]
+            : undefined;
+
+    return videoId && /^[\w-]{11}$/.test(videoId)
+      ? { type: 'youtube', src: `https://www.youtube-nocookie.com/embed/${videoId}` }
+      : null;
+  }
+
+  if (/\.pdf$/i.test(url.pathname)) {
+    return { type: 'pdf', src: url.href };
+  }
+
+  if (/\.(?:avif|bmp|gif|jpe?g|png|svg|webp)$/i.test(url.pathname)) {
+    return { type: 'image', src: url.href };
+  }
+
+  return null;
+}
+
+function getMediaCaption(value: string) {
+  const lastLine = value.trim().split(/\r?\n/).at(-1)?.trim() ?? '';
+  const watchIndex = lastLine.toLowerCase().lastIndexOf('watch');
+
+  if (watchIndex >= 0 && /^watch\s*:/i.test(lastLine.slice(watchIndex))) {
+    return lastLine
+      .slice(watchIndex)
+      .replace(/^watch\s*:\s*/i, '')
+      .trim();
+  }
+
+  return lastLine;
+}
+
+function parseContentSegments(content: string): ContentSegment[] {
+  const normalizedContent = content.replace(/&amp;/gi, '&');
+  const urlPattern = /(?:https?:\/\/|www\.)[^\s<>"']+/gi;
+  const segments: ContentSegment[] = [];
+  let cursor = 0;
+  let pendingText = '';
+  let match: RegExpExecArray | null;
+
+  while ((match = urlPattern.exec(normalizedContent)) !== null) {
+    pendingText += normalizedContent.slice(cursor, match.index);
+
+    const trailingPunctuation = match[0].match(/[.,;:!?)}\]]+$/)?.[0] ?? '';
+    const urlValue = match[0].slice(0, match[0].length - trailingPunctuation.length);
+    const media = getEmbeddedMedia(urlValue);
+
+    if (media) {
+      segments.push({
+        type: 'media',
+        media,
+        caption: getMediaCaption(pendingText),
+      });
+      pendingText = '';
+    } else {
+      pendingText += match[0];
+    }
+
+    cursor = match.index + match[0].length;
+  }
+
+  pendingText += normalizedContent.slice(cursor);
+
+  if (pendingText.trim()) {
+    segments.push({ type: 'text', text: pendingText.trim() });
+  }
+
+  return segments;
+}
+
+function renderContentSegment(segment: ContentSegment, key: string) {
+  if (segment.type === 'text') {
+    return <p key={key}>{segment.text}</p>;
+  }
+
+  return (
+    <article
+      key={key}
+      className={`bespoke-content-media-card bespoke-content-media-card--${segment.media.type}`}
+    >
+      {segment.caption ? <p className="bespoke-content-media-caption">{segment.caption}</p> : null}
+
+      {segment.media.type === 'youtube' ? (
+        <iframe
+          className="bespoke-content-media-frame bespoke-content-media-frame--video"
+          src={segment.media.src}
+          title={segment.caption || 'Technology video'}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      ) : segment.media.type === 'pdf' ? (
+        <iframe
+          className="bespoke-content-media-frame bespoke-content-media-frame--pdf"
+          src={segment.media.src}
+          title={`${segment.caption || 'Technology resource'} PDF`}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+        />
+      ) : (
+        <Image
+          className="bespoke-content-media-image"
+          src={segment.media.src}
+          alt={segment.caption || 'Technology resource'}
+          width={1200}
+          height={675}
+          unoptimized
+        />
+      )}
+    </article>
+  );
+}
+
+function TechnologyImageCarousel({ images, title }: { images: string[]; title: string }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  if (images.length === 0) return null;
+
+  const activeImage = images[activeIndex];
+
+  if (!activeImage) return null;
+
+  const showControls = images.length > 1;
+
+  return (
+    <div className="brand-image-carousel" aria-label={`${title} images`}>
+      <div className="brand-image-carousel__frame">
+        <Image
+          src={activeImage}
+          alt={`${title} image ${activeIndex + 1} of ${images.length}`}
+          fill
+          unoptimized
+          sizes="(max-width: 768px) 100vw, 1100px"
+        />
+      </div>
+
+      {showControls ? (
+        <div className="brand-image-carousel__controls">
+          <button
+            type="button"
+            aria-label="Previous image"
+            onClick={() => setActiveIndex((index) => (index - 1 + images.length) % images.length)}
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <span aria-live="polite">
+            {activeIndex + 1} / {images.length}
+          </span>
+          <button
+            type="button"
+            aria-label="Next image"
+            onClick={() => setActiveIndex((index) => (index + 1) % images.length)}
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 export default function TechnologyDetailPage() {
@@ -304,7 +556,7 @@ export default function TechnologyDetailPage() {
     return (
       <main className="cio-detail-page">
         <div className="cio-detail-container">
-          <div className="cio-detail-loading">Loading post...</div>
+          <div className="cio-detail-loading">Loading...</div>
         </div>
       </main>
     );
@@ -344,14 +596,40 @@ export default function TechnologyDetailPage() {
               <h1>{post.title}</h1>
 
               <div className="cio-detail-meta">
-                <span>
-                  <User size={15} />
+                <span className="cio-detail-meta-author">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="34"
+                    height="34"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20a8 8 0 0 1 16 0" />
+                  </svg>
                   {post.author}
                 </span>
 
                 {post.date ? (
-                  <span>
-                    <Calendar size={15} />
+                  <span className="cio-detail-meta-date">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="17"
+                      height="17"
+                      fill="none"
+                      stroke="#8e0101"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="5" width="18" height="16" rx="2" />
+                      <path d="M16 3v4M8 3v4M3 10h18" />
+                    </svg>
                     {post.date}
                   </span>
                 ) : null}
@@ -372,9 +650,17 @@ export default function TechnologyDetailPage() {
           </div>
 
           <div className="cio-detail-content">
-            {post.content.split('\n\n').map((paragraph, index) => (
-              <p key={`${paragraph.slice(0, 20)}-${index}`}>{paragraph}</p>
-            ))}
+            {post.content
+              .split(/\n\s*\n/)
+              .filter((paragraph) => paragraph.trim())
+              .map((paragraph, index) =>
+                parseContentSegments(paragraph).map((segment, segmentIndex) =>
+                  renderContentSegment(segment, `${index}-${segmentIndex}`),
+                ),
+              )}
+            {post.images.length > 0 ? (
+              <TechnologyImageCarousel images={post.images} title={post.title} />
+            ) : null}
           </div>
         </article>
       </div>

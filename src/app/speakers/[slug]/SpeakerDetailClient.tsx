@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { fetchWebsitePageBySlug, WebsitePage } from '@/services/pages.service';
 
 type SpeakerDetailClientProps = {
@@ -176,7 +177,7 @@ export default function SpeakerDetailClient({ slug }: SpeakerDetailClientProps) 
                     className="winner-profile-card winner-profile-card--red"
                   >
                     <div className="winner-profile-media">
-                      <img
+                      <Image
                         src={
                           typeof entry.avatar === 'string' && entry.avatar
                             ? entry.avatar
@@ -184,6 +185,9 @@ export default function SpeakerDetailClient({ slug }: SpeakerDetailClientProps) 
                         }
                         alt={typeof entry.author === 'string' ? entry.author : 'Speaker'}
                         className="winner-profile-image"
+                        width={420}
+                        height={420}
+                        unoptimized
                       />
                     </div>
 
@@ -217,7 +221,7 @@ export default function SpeakerDetailClient({ slug }: SpeakerDetailClientProps) 
                     className="winner-profile-card winner-profile-card--red"
                   >
                     <div className="winner-profile-media">
-                      <img
+                      <Image
                         src={
                           typeof entry.avatar === 'string' && entry.avatar
                             ? entry.avatar
@@ -225,6 +229,9 @@ export default function SpeakerDetailClient({ slug }: SpeakerDetailClientProps) 
                         }
                         alt={typeof entry.author === 'string' ? entry.author : 'Speaker'}
                         className="winner-profile-image"
+                        width={420}
+                        height={420}
+                        unoptimized
                       />
                     </div>
 

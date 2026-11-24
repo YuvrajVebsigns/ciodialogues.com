@@ -219,7 +219,7 @@ const SERVICE_OPTIONS = [
 ];
 
 const TURNSTILE_SCRIPT_SRC =
-  'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+  'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&language=en';
 
 declare global {
   interface Window {
@@ -310,7 +310,7 @@ export default function ContactSection() {
     if (!turnstileSiteKey) {
       setCaptchaStatus('error');
 
-      setPopupMessage('CAPTCHA configuration is missing. Please try again later.');
+      setPopupMessage('Security verification is unavailable. Please try again later.');
 
       return;
     }
@@ -325,7 +325,7 @@ export default function ContactSection() {
       if (!window.turnstile) {
         setCaptchaStatus('error');
 
-        setPopupMessage('Unable to load CAPTCHA verification. Please try again later.');
+        setPopupMessage('Unable to load security verification. Please try again later.');
 
         return;
       }
@@ -351,14 +351,10 @@ export default function ContactSection() {
           sitekey: turnstileSiteKey,
 
           /*
-           * Invisible Turnstile.
+           * Invisible mode keeps the Cloudflare widget hidden.
+           * The custom security card provides the visible status.
            */
           size: 'invisible',
-
-          /*
-           * Verification starts only when execute()
-           * is called.
-           */
           execution: 'execute',
 
           theme: 'light',
@@ -397,7 +393,7 @@ export default function ContactSection() {
 
             setIsRefreshingCaptcha(false);
 
-            setPopupMessage('CAPTCHA verification expired. Please verify again.');
+            setPopupMessage('Security verification has expired. Please verify again.');
           },
 
           /*
@@ -416,10 +412,10 @@ export default function ContactSection() {
 
             if (errorCode === '110200') {
               setPopupMessage(
-                'CAPTCHA domain is not authorized in Cloudflare. Please add this website hostname to Turnstile Hostname Management.',
+                'Security verification could not be completed. Please refresh and try again.',
               );
             } else {
-              setPopupMessage('CAPTCHA verification failed. Please try again.');
+              setPopupMessage('Security verification failed. Please try again.');
             }
           },
 
@@ -437,7 +433,7 @@ export default function ContactSection() {
 
             setIsRefreshingCaptcha(false);
 
-            setPopupMessage('CAPTCHA verification timed out. Please try again.');
+            setPopupMessage('Security verification timed out. Please try again.');
           },
         });
 
@@ -457,7 +453,7 @@ export default function ContactSection() {
       } catch {
         setCaptchaStatus('error');
 
-        setPopupMessage('Unable to load CAPTCHA. Please try again later.');
+        setPopupMessage('Unable to load security verification. Please try again later.');
       }
     };
 
@@ -502,7 +498,9 @@ export default function ContactSection() {
 
       setCaptchaStatus('error');
 
-      setPopupMessage('Unable to connect to CAPTCHA service. Please try again later.');
+      setPopupMessage(
+        'Unable to connect to the security verification service. Please try again later.',
+      );
     });
 
     document.head.appendChild(script);
@@ -570,7 +568,7 @@ export default function ContactSection() {
      * have been completed.
      */
     if (!isFormComplete) {
-      setPopupMessage('Please complete all required fields before CAPTCHA verification.');
+      setPopupMessage('Please complete all required fields before security verification.');
 
       return;
     }
@@ -581,7 +579,7 @@ export default function ContactSection() {
     if (!window.turnstile) {
       setCaptchaStatus('error');
 
-      setPopupMessage('CAPTCHA is still loading. Please try again.');
+      setPopupMessage('Security verification is still loading. Please try again.');
 
       return;
     }
@@ -592,7 +590,7 @@ export default function ContactSection() {
     if (!turnstileWidgetIdRef.current) {
       setCaptchaStatus('error');
 
-      setPopupMessage('CAPTCHA is not ready. Please refresh the page and try again.');
+      setPopupMessage('Security verification is not ready. Please refresh the page and try again.');
 
       return;
     }
@@ -606,16 +604,13 @@ export default function ContactSection() {
 
     try {
       setCaptchaStatus('verifying');
-
       setIsRefreshingCaptcha(false);
-
       setPopupMessage(null);
-
       window.turnstile.execute(turnstileWidgetIdRef.current);
     } catch {
       setCaptchaStatus('error');
 
-      setPopupMessage('Unable to start CAPTCHA verification. Please try again.');
+      setPopupMessage('Unable to start security verification. Please try again.');
     }
   }
 
@@ -671,14 +666,14 @@ export default function ContactSection() {
 
         setIsRefreshingCaptcha(false);
 
-        setPopupMessage('Unable to refresh CAPTCHA. Please try again.');
+        setPopupMessage('Unable to refresh security verification. Please try again.');
       }
     } else {
       setCaptchaStatus('error');
 
       setIsRefreshingCaptcha(false);
 
-      setPopupMessage('CAPTCHA is not available. Please refresh the page.');
+      setPopupMessage('Security verification is unavailable. Please refresh the page.');
     }
   }
 
@@ -738,7 +733,7 @@ export default function ContactSection() {
     ======================================================= */
 
     if (!captchaToken) {
-      setPopupMessage('Please complete the CAPTCHA verification.');
+      setPopupMessage('Please complete the security verification.');
 
       return;
     }
@@ -977,7 +972,7 @@ export default function ContactSection() {
             ================================================== */}
 
             <div className="contact-captcha">
-              <label className="captcha-title">CAPTCHA *</label>
+              <label className="captcha-title">SECURITY CHECK *</label>
 
               <div
                 className={`custom-captcha ${
@@ -1017,7 +1012,7 @@ export default function ContactSection() {
                     {captchaStatus === 'verified'
                       ? 'You can now submit the form.'
                       : captchaStatus === 'verifying'
-                        ? 'Cloudflare is checking your request.'
+                        ? 'Confirming that this request is legitimate.'
                         : captchaStatus === 'error'
                           ? 'Please try again.'
                           : !isFormComplete
@@ -1052,7 +1047,7 @@ export default function ContactSection() {
                       ? 'Loading...'
                       : captchaStatus === 'verifying'
                         ? 'Checking...'
-                        : 'I’m human'}
+                        : 'Verify'}
                   </button>
                 )}
 
@@ -1066,7 +1061,7 @@ export default function ContactSection() {
                     className="captcha-refresh-icon-button"
                     onClick={resetTurnstile}
                     disabled={isRefreshingCaptcha || isSubmitting}
-                    aria-label="Refresh CAPTCHA"
+                    aria-label="Refresh security verification"
                   >
                     <RefreshCw size={18} className={isRefreshingCaptcha ? 'captcha-spin' : ''} />
                   </button>

@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'beracore-media-bucket-dev.idr01.zata.ai' },
       { protocol: 'https', hostname: 'backend.uatcoremedia.vebsigns.com' },
       { protocol: 'https', hostname: 'admin.uatcoremedia.vebsigns.com' },
+      { protocol: 'https', hostname: 'coremediagroup.sgp1.digitaloceanspaces.com' },
     ],
   },
 };

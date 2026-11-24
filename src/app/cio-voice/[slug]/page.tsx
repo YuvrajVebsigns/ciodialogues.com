@@ -19,6 +19,8 @@ type CIOPostDetail = {
   content: string;
 };
 
+type ContentSegment = { type: 'text'; text: string } | { type: 'image'; src: string };
+
 const fallbackImage = '/assets/blogs/blog-1.webp';
 
 function generateSlug(text: string) {
@@ -65,6 +67,50 @@ function testimonialToDetail(item: PageTestimonial): CIOPostDetail {
     image: getValidImage(item.avatar),
     content: item.quote || '',
   };
+}
+
+function parseContentSegments(content: string): ContentSegment[] {
+  const normalizedContent = content.replace(/&amp;/gi, '&');
+  const urlPattern = /(?:https?:\/\/|www\.)[^\s<>"']+/gi;
+  const segments: ContentSegment[] = [];
+  let cursor = 0;
+  let pendingText = '';
+  let match: RegExpExecArray | null;
+
+  while ((match = urlPattern.exec(normalizedContent)) !== null) {
+    const prefix = normalizedContent.slice(cursor, match.index);
+    pendingText += prefix;
+
+    const trailingPunctuation = match[0].match(/[.,;:!?)}\]]+$/)?.[0] ?? '';
+    const urlValue = match[0].slice(0, match[0].length - trailingPunctuation.length);
+    const src = /^www\./i.test(urlValue) ? `https://${urlValue}` : urlValue;
+
+    const isImageUrl =
+      /\.(?:avif|bmp|gif|jpe?g|png|svg|webp)(?:[?#].*)$/i.test(src) ||
+      /\.(?:avif|bmp|gif|jpe?g|png|svg|webp)$/i.test(src) ||
+      /\/manual_upload\/.*\.(?:avif|bmp|gif|jpe?g|png|svg|webp)/i.test(src);
+
+    if (isImageUrl) {
+      if (pendingText.trim()) {
+        segments.push({ type: 'text', text: pendingText.trim() });
+        pendingText = '';
+      }
+
+      segments.push({ type: 'image', src });
+    } else {
+      pendingText += match[0];
+    }
+
+    cursor = match.index + match[0].length;
+  }
+
+  pendingText += normalizedContent.slice(cursor);
+
+  if (pendingText.trim()) {
+    segments.push({ type: 'text', text: pendingText.trim() });
+  }
+
+  return segments;
 }
 
 export default function CIOVoiceDetailPage() {
@@ -116,7 +162,7 @@ export default function CIOVoiceDetailPage() {
     return (
       <main className="cio-detail-page">
         <div className="cio-detail-container">
-          <div className="cio-detail-loading">Loading post...</div>
+          <div className="cio-detail-loading">Loading...</div>
         </div>
       </main>
     );
@@ -192,9 +238,33 @@ export default function CIOVoiceDetailPage() {
           </div>
 
           <div className="cio-detail-content">
-            {post.content.split('\n\n').map((paragraph, index) => (
-              <p key={`${paragraph.slice(0, 20)}-${index}`}>{paragraph}</p>
-            ))}
+            {post.content
+              .split(/\n\s*\n/)
+              .filter((paragraph) => paragraph.trim())
+              .map((paragraph, index) =>
+                parseContentSegments(paragraph).map((segment, segmentIndex) => {
+                  if (segment.type === 'text') {
+                    return <p key={`${index}-${segmentIndex}`}>{segment.text}</p>;
+                  }
+
+                  return (
+                    <div
+                      key={`${index}-${segmentIndex}`}
+                      className="cio-inline-image"
+                      aria-label={post.title}
+                    >
+                      <Image
+                        src={segment.src}
+                        alt={post.title}
+                        width={1200}
+                        height={675}
+                        unoptimized
+                        sizes="(max-width: 768px) 100vw, 900px"
+                      />
+                    </div>
+                  );
+                }),
+              )}
           </div>
         </article>
       </div>

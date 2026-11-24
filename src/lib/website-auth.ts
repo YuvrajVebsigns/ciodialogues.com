@@ -37,7 +37,20 @@ type WebsiteTokenResponse = {
 /** Domain registered in the backend for this website (must match admin website). */
 export function getWebsiteDomain(): string {
   if (process.env.NEXT_PUBLIC_WEBSITE_DOMAIN) {
-    return process.env.NEXT_PUBLIC_WEBSITE_DOMAIN;
+    const configuredDomain = process.env.NEXT_PUBLIC_WEBSITE_DOMAIN.trim();
+
+    try {
+      const parsedDomain = configuredDomain.includes('://')
+        ? new URL(configuredDomain)
+        : new URL(`https://${configuredDomain}`);
+
+      return parsedDomain.hostname.replace(/^www\./, '');
+    } catch {
+      return configuredDomain
+        .replace(/^https?:\/\//, '')
+        .replace(/^www\./, '')
+        .replace(/\/$/, '');
+    }
   }
 
   if (typeof window !== 'undefined') {

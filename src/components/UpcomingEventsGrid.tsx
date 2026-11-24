@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
 
@@ -229,11 +230,13 @@ export default function UpcomingEventsGrid() {
                   className="upcoming-events__media"
                   aria-label={`View ${title}`}
                 >
-                  <img
+                  <Image
                     src={imageSrc}
                     alt={title}
                     className="upcoming-events__image"
-                    loading="lazy"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 400px"
+                    unoptimized
                     onError={(event) => {
                       const img = event.currentTarget;
 

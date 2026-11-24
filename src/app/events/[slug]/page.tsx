@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import ClientErrorBoundary from '@/components/ClientErrorBoundary';
 import EventDetailsAnimated from '@/components/EventDetailsAnimated';
 import EventSponsorsSection from '@/components/EventSponsorsSection';
+import type { EventSponsor } from '@/components/EventSponsorsSection';
 import {
   getWebsiteEventImage,
   fetchWebsiteEventByIdOrSlug,
@@ -31,6 +32,153 @@ function getString(value: unknown, fallback = ''): string {
 
 function getEventField(event: WebsiteEvent, key: string): unknown {
   return (event as unknown as Record<string, unknown>)[key];
+}
+
+function getSponsorName(value: unknown): string {
+  if (typeof value === 'string') return value.trim();
+
+  if (!isRecord(value)) return '';
+
+  for (const key of ['name', 'title', 'companyName', 'brandName', 'label']) {
+    if (typeof value[key] === 'string' && value[key].trim()) {
+      return value[key].trim();
+    }
+  }
+
+  return '';
+}
+
+function getSponsorLogo(value: unknown): string {
+  if (typeof value === 'string') return value.trim();
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const logo = getSponsorLogo(item);
+      if (logo) return logo;
+    }
+
+    return '';
+  }
+
+  if (!isRecord(value)) return '';
+
+  for (const key of [
+    'url',
+    'src',
+    'path',
+    'logo',
+    'logoUrl',
+    'logo_url',
+    'image',
+    'imageUrl',
+    'image_url',
+    'secure_url',
+  ]) {
+    const logo = getSponsorLogo(value[key]);
+    if (logo) return logo;
+  }
+
+  return '';
+}
+
+function extractEventSponsors(event: WebsiteEvent): EventSponsor[] {
+  const sponsors: EventSponsor[] = [];
+  const visited = new Set<object>();
+
+  const collect = (value: unknown, keyHint = '') => {
+    if (Array.isArray(value)) {
+      value.forEach((item) => collect(item, keyHint));
+      return;
+    }
+
+    if (!isRecord(value) || visited.has(value)) return;
+    visited.add(value);
+
+    const record = value as Record<string, unknown>;
+    const name = getSponsorName(
+      record.name ?? record.title ?? record.companyName ?? record.brandName,
+    );
+    const logo = getSponsorLogo(
+      record.logo ??
+        record.logoUrl ??
+        record.logo_url ??
+        record.image ??
+        record.imageUrl ??
+        record.image_url ??
+        record,
+    );
+
+    if (name && logo) {
+      const tier =
+        typeof record.tier === 'string'
+          ? record.tier
+          : typeof record.category === 'string'
+            ? record.category
+            : typeof record.level === 'string'
+              ? record.level
+              : undefined;
+
+      const description =
+        typeof record.description === 'string'
+          ? record.description
+          : typeof record.shortDescription === 'string'
+            ? record.shortDescription
+            : undefined;
+
+      const website =
+        typeof record.website === 'string'
+          ? record.website
+          : typeof record.url === 'string'
+            ? record.url
+            : typeof record.link === 'string'
+              ? record.link
+              : undefined;
+
+      sponsors.push({
+        id: String(record.id ?? record._id ?? `${keyHint}-${sponsors.length}`),
+        name,
+        logoUrl: logo,
+        tier,
+        description,
+        website,
+      });
+      return;
+    }
+
+    for (const [key, nestedValue] of Object.entries(record)) {
+      if (/sponsor|partner|brand/i.test(key)) {
+        collect(nestedValue, key);
+      }
+    }
+  };
+
+  for (const [key, nestedValue] of Object.entries(event as unknown as Record<string, unknown>)) {
+    if (/sponsor|partner|brand/i.test(key)) {
+      collect(nestedValue, key);
+    }
+  }
+
+  return sponsors;
+}
+
+function formatEventDateTime(value: unknown): string {
+  if (typeof value !== 'string' || !value.trim()) return 'Date to be announced';
+
+  const normalizedValue = value.trim();
+  const date = /^\d{4}-\d{2}-\d{2}T/.test(normalizedValue)
+    ? new Date(normalizedValue)
+    : new Date(normalizedValue);
+
+  if (Number.isNaN(date.getTime())) return normalizedValue;
+
+  return new Intl.DateTimeFormat('en-IN', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  }).format(date);
 }
 
 function openExternal(url: string) {
@@ -196,7 +344,7 @@ export default function EventDetailsPage() {
   if (isLoading) {
     return (
       <main className="event-details-page">
-        <p style={{ padding: '80px 20px', textAlign: 'center' }}>Loading event...</p>
+        <p style={{ padding: '80px 20px', textAlign: 'center' }}>Loading...</p>
       </main>
     );
   }
@@ -264,7 +412,11 @@ export default function EventDetailsPage() {
     author: String(
       getEventField(event, 'organizer') ?? getEventField(event, 'author') ?? 'CORE Media',
     ),
-    date: String(getEventField(event, 'startsAt') ?? getEventField(event, 'date') ?? ''),
+    date: formatEventDateTime(
+      getEventField(event, 'startsAt') ??
+        getEventField(event, 'startDate') ??
+        getEventField(event, 'date'),
+    ),
     heroImage: getWebsiteEventImage(event),
     badge: String(getEventField(event, 'category') ?? 'Events'),
     summary: extractTextFromContent(
@@ -375,6 +527,7 @@ export default function EventDetailsPage() {
   }
 
   const eventContent = getEventField(event, 'content');
+  const eventSponsors = extractEventSponsors(event);
 
   const contentBlocks =
     isRecord(eventContent) && Array.isArray(eventContent.blocks) ? eventContent.blocks : [];
@@ -385,7 +538,7 @@ export default function EventDetailsPage() {
         <ClientErrorBoundary>
           <EventDetailsAnimated featuredEvent={featuredEvent} readableSlug={readableSlug} />
 
-          <EventSponsorsSection />
+          <EventSponsorsSection sponsors={eventSponsors} />
 
           {contentBlocks.length > 0 ? (
             <div>{contentBlocks.map((block, index) => renderBlock(block, index))}</div>

@@ -143,35 +143,22 @@ export default function AboutUsSection() {
       <div className="aboutus-container">
         <div className="aboutus-heading">
           <span className="aboutus-label-text">About Us</span>
-
-          <h2 className="aboutus-title">
-            {/* CIODialogues.com */}
-            {/* <br /> */}
-            <span>C-Suite Knowledge Platform</span>
-          </h2>
         </div>
 
         <div className="aboutus-story-card">
           <p>
-            <strong>CIODialogues.com</strong> is a one-of-its-kind digital platform curated for the
-            C-Suite, especially the CIO community, to share their thoughts and ideas in the true
-            spirit of peer-to-peer learning and sharing.
+            CIODialogues.com is a one-of-its-kind digital platform curated for the C-Suite,
+            especially the CIO community, to share their thoughts and ideas in the true spirit of
+            peer-to-peer learning and sharing. It aims to help decision-makers get inspired and
+            benefit from the experience of innovative leaders from the ICT universe, including CEOs
+            / CIOs/ CISOs/ CMOs.
           </p>
 
           <p>
-            It aims to help decision-makers get inspired and benefit from the experience of
-            innovative leaders from the ICT universe, including CEOs, CIOs, CISOs, and CMOs.
-          </p>
-
-          <p>
-            The platform is an initiative of <strong>CORE Media</strong>, a multi-platform new age
-            niche media company that owns and operates proprietary marketing event brands in India
-            with a focus on ICT Enterprises, CIO Community and Technology Startups.
-          </p>
-
-          <p>
-            Through all its platforms, CORE Media has a combined total reach of around{' '}
-            <strong>36,000 people</strong> in the CXO community.
+            The platform is an initiative of CORE Media, a multi-platform new age niche media
+            company that owns and operates proprietary marketing event brands in India with a focus
+            on ICT Enterprises, CIO Community and Technology Startups. Through all its platforms,
+            CORE Media has a combined total reach of around 36,000 people in the CXO community.
           </p>
         </div>
       </div>

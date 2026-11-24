@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 const associateBrands = [
   {
     name: 'CIO Angel Network',
@@ -70,7 +72,7 @@ export default function AssociateBrandsPage() {
             {associateBrands.map((brand, index) => (
               <div className="associate-brand-card" key={index}>
                 <div className="associate-brand-logo-box">
-                  <img src={brand.logo} alt={brand.name} />
+                  <Image src={brand.logo} alt={brand.name} width={180} height={90} unoptimized />
                 </div>
 
                 <h3>{brand.name}</h3>

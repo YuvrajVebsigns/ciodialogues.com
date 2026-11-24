@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import useScrollAnimation from '../hooks/useScrollAnimation';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 type Section = {
   heading: string;
@@ -41,6 +42,12 @@ export default function EventDetailsAnimated({
   featuredEvent: FeaturedEvent;
   readableSlug: string;
 }) {
+  const [heroImage, setHeroImage] = useState(featuredEvent.heroImage);
+
+  useEffect(() => {
+    setHeroImage(featuredEvent.heroImage);
+  }, [featuredEvent.heroImage]);
+
   const heroRef = useScrollAnimation<HTMLDivElement>({
     animationClass: 'animate-fade-in-right',
     initialTransform: 'translateX(-24px)',
@@ -59,11 +66,14 @@ export default function EventDetailsAnimated({
       <div className="event-details-hero" ref={heroRef}>
         <div className="event-details-image-wrap">
           <Image
-            src={featuredEvent.heroImage}
+            src={heroImage}
             alt={featuredEvent.title}
             fill
             priority
+            unoptimized
+            quality={100}
             className="event-details-image"
+            onError={() => setHeroImage('/assets/blogs/blog-1.webp')}
           />
         </div>
 

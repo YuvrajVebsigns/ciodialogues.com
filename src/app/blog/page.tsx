@@ -13,6 +13,21 @@ import {
 } from '@/services/blogs.service';
 
 const FALLBACK_BLOG_IMAGE = '/assets/blogs/blog-1.webp';
+const LIKED_KEY = 'likedBlogs';
+
+function readLikedSet(): Set<string> {
+  try {
+    const raw = typeof window !== 'undefined' ? window.localStorage.getItem(LIKED_KEY) : null;
+    if (!raw) return new Set();
+
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return new Set();
+
+    return new Set(arr.map(String));
+  } catch {
+    return new Set();
+  }
+}
 
 function getBlogCategory(blog: WebsiteBlogItem) {
   return blog.websites?.[0]?.name || blog.tags?.[0] || 'Blog';
@@ -51,22 +66,6 @@ function AnimatedBlogCard({ blog, index, variant = 'animate-fade-in' }: Animated
   const [liked, setLiked] = useState<boolean>(false);
   const [imageSrc, setImageSrc] = useState<string>(() => getBlogImage(blog));
 
-  const LIKED_KEY = 'likedBlogs';
-
-  function readLikedSet(): Set<string> {
-    try {
-      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(LIKED_KEY) : null;
-      if (!raw) return new Set();
-
-      const arr = JSON.parse(raw);
-      if (!Array.isArray(arr)) return new Set();
-
-      return new Set(arr.map(String));
-    } catch {
-      return new Set();
-    }
-  }
-
   function markBlogLiked(id: string | number) {
     try {
       const set = readLikedSet();
@@ -87,16 +86,15 @@ function AnimatedBlogCard({ blog, index, variant = 'animate-fade-in' }: Animated
     }
   }
 
-  function isBlogLiked(id?: string | number) {
-    if (!id) return false;
-    return readLikedSet().has(String(id));
-  }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    setLiked(isBlogLiked(blog.id));
+    const blogId = blog.id ? String(blog.id) : '';
+    setLiked(blogId ? readLikedSet().has(blogId) : false);
     setLocalLikes(likesCount);
-    setImageSrc(getBlogImage(blog));
+    setImageSrc(
+      extractImageUrl(blog.featureImage) ||
+        extractImageUrl(blog.seo?.ogImage) ||
+        FALLBACK_BLOG_IMAGE,
+    );
   }, [blog.id, blog.featureImage, blog.seo?.ogImage, likesCount]);
 
   async function handleLikeClick(e: React.MouseEvent<HTMLButtonElement>) {

@@ -6,6 +6,7 @@ import {
 } from '@/lib/website-auth';
 import type { WebsiteAuth } from '@/lib/website-auth';
 import { apiFetch } from '@/services/apiFetch';
+import { extractImageUrl } from '@/lib/image-url';
 
 export type WebsiteEvent = {
   id: string;
@@ -48,28 +49,24 @@ function getImageUrl(value: unknown): string | undefined {
   }
 
   if (typeof value === 'string') {
-    const imageUrl = value.trim();
-    const normalizedUrl = imageUrl.toLowerCase();
-
-    return imageUrl && normalizedUrl !== 'null' && normalizedUrl !== 'undefined'
-      ? imageUrl
-      : undefined;
+    return extractImageUrl(value);
   }
 
   if (!isRecord(value)) return undefined;
 
-  for (const key of [
-    'url',
-    'src',
-    'path',
-    'secure_url',
-    'image',
-    'imageUrl',
-    'thumbnail',
-    'thumbnailUrl',
-    'fileUrl',
-    'original',
-  ]) {
+  for (const key of ['original', 'large', 'url', 'src', 'path', 'secure_url']) {
+    const imageUrl = getImageUrl(value[key]);
+    if (imageUrl) return imageUrl;
+  }
+
+  if (isRecord(value.urlVariants)) {
+    for (const key of ['original', 'large', 'medium', 'small', 'thumbnail']) {
+      const imageUrl = getImageUrl(value.urlVariants[key]);
+      if (imageUrl) return imageUrl;
+    }
+  }
+
+  for (const key of ['image', 'imageUrl', 'thumbnail', 'thumbnailUrl', 'fileUrl', 'original']) {
     const imageUrl = getImageUrl(value[key]);
     if (imageUrl) return imageUrl;
   }
@@ -78,20 +75,71 @@ function getImageUrl(value: unknown): string | undefined {
 }
 
 export function getWebsiteEventImage(event: WebsiteEvent): string {
-  for (const key of [
+  const preferredKeys = [
     'image',
     'heroImage',
+    'hero_image',
     'banner',
+    'bannerImage',
+    'banner_image',
     'coverImage',
+    'cover_image',
+    'featuredImage',
+    'featured_image',
+    'featureImage',
+    'feature_image',
     'thumbnail',
-    'imageUrl',
-    'thumbnailUrl',
     'poster',
+    'posterImage',
+    'poster_image',
+    'imageUrl',
+    'image_url',
+    'thumbnailUrl',
+    'thumbnail_url',
+    'originalImage',
+    'original_image',
     'media',
-  ]) {
+  ];
+
+  for (const key of preferredKeys) {
     const imageUrl = getImageUrl(event[key]);
     if (imageUrl) return imageUrl;
   }
+
+  const visited = new Set<object>();
+
+  const findNestedImage = (value: unknown): string | undefined => {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const imageUrl = findNestedImage(item);
+        if (imageUrl) return imageUrl;
+      }
+      return undefined;
+    }
+
+    if (!isRecord(value) || visited.has(value)) return undefined;
+    visited.add(value);
+
+    for (const key of preferredKeys) {
+      const imageUrl = getImageUrl(value[key]);
+      if (imageUrl) return imageUrl;
+    }
+
+    for (const [key, nestedValue] of Object.entries(value)) {
+      if (/image|banner|cover|thumbnail|poster|featured|feature|media|avatar|photo/i.test(key)) {
+        const imageUrl = getImageUrl(nestedValue);
+        if (imageUrl) return imageUrl;
+      }
+
+      const nestedImage = findNestedImage(nestedValue);
+      if (nestedImage) return nestedImage;
+    }
+
+    return undefined;
+  };
+
+  const nestedImage = findNestedImage(event);
+  if (nestedImage) return nestedImage;
 
   return FALLBACK_WEBSITE_EVENT_IMAGE;
 }

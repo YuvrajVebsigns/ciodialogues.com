@@ -4,6 +4,7 @@ import EditorialHeroGrid from '@/components/EditorialHeroGrid';
 import VideoDialoguesShowcase from '@/components/VideoDialoguesShowcase';
 import UpcomingEventsGrid from '@/components/UpcomingEventsGrid';
 import FoundersMessage from '@/components/FoundersMessage';
+import AboutUsSection from '@/components/ExpertiseSection';
 import EditorialCategoryNavbar from '@/components/AllSection';
 import ContactSection from '@/components/ContactSection';
 import { MOCK_VIDEOS, MOCK_DIALOGUES } from '@/constants/mockData';
@@ -28,6 +29,9 @@ export default function Home() {
 
       {/* Refined and modernized Founder's message */}
       <FoundersMessage />
+
+      {/* About us */}
+      <AboutUsSection />
 
       {/* Quick connection / lead capture section */}
       <ContactSection />

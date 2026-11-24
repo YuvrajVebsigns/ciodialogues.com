@@ -327,7 +327,7 @@ export default function MainStoryPage() {
                     </Link>
 
                     <small>
-                      {post.author}
+                      By {post.author}
                       {post.date ? ` · ${post.date}` : ''}
                     </small>
 
@@ -439,6 +439,45 @@ export default function MainStoryPage() {
                     <Link href={`/main-story/${post.slug}`}>
                       <h3>{post.title}</h3>
                     </Link>
+
+                    <div className="news-editorial-list-meta">
+                      <span className="news-editorial-list-meta-author">
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="28"
+                          height="28"
+                          fill="none"
+                          stroke="#ffffff"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="8" r="4" />
+                          <path d="M4 20a8 8 0 0 1 16 0" />
+                        </svg>
+                        {post.author}
+                      </span>
+                      {post.date ? (
+                        <span className="news-editorial-list-meta-date">
+                          <svg
+                            viewBox="0 0 24 24"
+                            width="14"
+                            height="14"
+                            fill="none"
+                            stroke="#8e0101"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                          >
+                            <rect x="3" y="5" width="18" height="16" rx="2" />
+                            <path d="M16 3v4M8 3v4M3 10h18" />
+                          </svg>
+                          {post.date}
+                        </span>
+                      ) : null}
+                    </div>
 
                     <p>{post.excerpt}</p>
                   </article>

@@ -202,6 +202,7 @@ import { apiFetch } from '@/services/apiFetch';
 type WebsiteAuth = {
   token: string;
   websiteId: string;
+  domain: string;
 };
 
 type WebsiteTokenResponse = {
@@ -283,7 +284,7 @@ export type ContactResponse = {
 /**
  * Read website authentication details from localStorage.
  */
-function readStoredWebsiteAuth(): WebsiteAuth | null {
+function readStoredWebsiteAuth(domain: string): WebsiteAuth | null {
   if (typeof window === 'undefined') {
     return null;
   }
@@ -302,13 +303,20 @@ function readStoredWebsiteAuth(): WebsiteAuth | null {
       parsed !== null &&
       'token' in parsed &&
       'websiteId' in parsed &&
+      'domain' in parsed &&
       typeof (parsed as { token?: unknown }).token === 'string' &&
-      typeof (parsed as { websiteId?: unknown }).websiteId === 'string'
+      typeof (parsed as { websiteId?: unknown }).websiteId === 'string' &&
+      typeof (parsed as { domain?: unknown }).domain === 'string'
     ) {
-      return {
-        token: (parsed as { token: string }).token,
-        websiteId: (parsed as { websiteId: string }).websiteId,
-      };
+      const storedDomain = (parsed as { domain: string }).domain;
+
+      if (storedDomain === domain) {
+        return {
+          token: (parsed as { token: string }).token,
+          websiteId: (parsed as { websiteId: string }).websiteId,
+          domain: storedDomain,
+        };
+      }
     }
   } catch {
     return null;
@@ -358,7 +366,7 @@ async function ensureWebsiteAuth(domain: string): Promise<WebsiteAuth | null> {
     return null;
   }
 
-  const stored = readStoredWebsiteAuth();
+  const stored = readStoredWebsiteAuth(domain);
 
   if (stored) {
     return stored;
@@ -391,6 +399,7 @@ async function ensureWebsiteAuth(domain: string): Promise<WebsiteAuth | null> {
   const value: WebsiteAuth = {
     token,
     websiteId,
+    domain,
   };
 
   window.localStorage.setItem('websiteAuth', JSON.stringify(value));
@@ -463,6 +472,8 @@ export async function submitWebsiteContact(payload: ContactSubmission): Promise<
     headers['x-website-id'] = auth.websiteId;
   }
 
+  headers['x-website-domain'] = domain;
+
   /**
    * Build the exact payload expected by the backend.
    *
@@ -505,6 +516,7 @@ export async function submitWebsiteContact(payload: ContactSubmission): Promise<
           'Content-Type': 'application/json',
           Authorization: `Bearer ${freshAuth.token}`,
           'x-website-id': freshAuth.websiteId,
+          'x-website-domain': domain,
         };
 
         return apiFetch<ContactResponse>(API_ENDPOINTS.WEBSITE.CONTACTS, {

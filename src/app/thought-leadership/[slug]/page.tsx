@@ -189,7 +189,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, User } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 
@@ -226,6 +226,25 @@ function getRoleMeta(role: string) {
     .map((item) => item.trim())
     .filter(Boolean);
 
+  if (parts.length === 1) {
+    const dateMatch = parts[0]?.match(
+      /(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}/i,
+    );
+
+    if (dateMatch) {
+      const date = dateMatch[0] ?? '';
+      const author = (parts[0] ?? '')
+        .replace(date, '')
+        .replace(/[-–—,]\s*$/, '')
+        .trim();
+
+      return {
+        author: author || 'CIO Dialogues Team',
+        date,
+      };
+    }
+  }
+
   return {
     author: parts[0] || 'CIO Dialogues Team',
     date: parts[1] || '',
@@ -256,6 +275,49 @@ function testimonialToPost(item: PageTestimonial): PostDetail {
   };
 }
 
+function extractExternalCompanyLink(content: string): {
+  content: string;
+  link: string;
+} {
+  const normalizedContent = content.replace(/&amp;/gi, '&');
+  const urlPattern = /(?:https?:\/\/|www\.)[^\s<>"']+/gi;
+  let companyLink = '';
+  let cleanedContent = normalizedContent;
+
+  for (const match of normalizedContent.matchAll(urlPattern)) {
+    const rawUrl = match[0] ?? '';
+    const urlValue = rawUrl.replace(/[.,;:!?)}\]]+$/, '');
+    const normalizedUrl = /^www\./i.test(urlValue) ? `https://${urlValue}` : urlValue;
+
+    try {
+      const url = new URL(normalizedUrl);
+      const hostname = url.hostname.toLowerCase();
+
+      const isCompanyWebsite =
+        !hostname.includes('youtube.') &&
+        !hostname.includes('youtu.be') &&
+        !/\.(?:avif|bmp|gif|jpe?g|png|svg|webp)$/i.test(url.pathname);
+
+      if (isCompanyWebsite) {
+        companyLink = url.href;
+        cleanedContent = cleanedContent.replace(rawUrl, '').replace(urlValue, '').trim();
+        break;
+      }
+    } catch {
+      // Ignore malformed URL values.
+    }
+  }
+
+  return {
+    content: cleanedContent
+      .replace(/[ \t]+/g, ' ')
+      .replace(/\s*\n\s*/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim(),
+    link: companyLink,
+  };
+}
+
 export default function ThoughtLeadershipDetailPage() {
   const params = useParams();
   const slug = params?.slug as string;
@@ -264,6 +326,7 @@ export default function ThoughtLeadershipDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [imageSrc, setImageSrc] = useState(fallbackImage);
+  const { content, link } = extractExternalCompanyLink(post?.content || '');
   useEffect(() => {
     setImageSrc(post?.image || fallbackImage);
   }, [post]);
@@ -312,7 +375,7 @@ export default function ThoughtLeadershipDetailPage() {
     return (
       <main className="cio-detail-page">
         <div className="cio-detail-container">
-          <div className="cio-detail-loading">Loading post...</div>
+          <div className="cio-detail-loading">Loading...</div>
         </div>
       </main>
     );
@@ -353,14 +416,40 @@ export default function ThoughtLeadershipDetailPage() {
               <h1>{post.title}</h1>
 
               <div className="cio-detail-meta">
-                <span>
-                  <User size={15} />
+                <span className="cio-detail-meta-author">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="34"
+                    height="34"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20a8 8 0 0 1 16 0" />
+                  </svg>
                   {post.author}
                 </span>
 
                 {post.date && (
-                  <span>
-                    <Calendar size={15} />
+                  <span className="cio-detail-meta-date">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="17"
+                      height="17"
+                      fill="none"
+                      stroke="#8e0101"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="5" width="18" height="16" rx="2" />
+                      <path d="M16 3v4M8 3v4M3 10h18" />
+                    </svg>
                     {post.date}
                   </span>
                 )}
@@ -381,12 +470,21 @@ export default function ThoughtLeadershipDetailPage() {
           </div>
 
           <div className="cio-detail-content">
-            {post.content
+            {content
               .split('\n\n')
               .filter((paragraph) => paragraph.trim())
               .map((paragraph, index) => (
                 <p key={index}>{paragraph}</p>
               ))}
+
+            {link ? (
+              <div className="cio-detail-company-link">
+                <a href={link} target="_blank" rel="noopener noreferrer">
+                  Click Here
+                  <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            ) : null}
           </div>
         </article>
       </div>

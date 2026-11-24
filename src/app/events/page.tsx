@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
 
@@ -184,7 +185,14 @@ export default function EventsPage() {
     <>
       <section className="blog-hero">
         <div className="blog-hero-media" ref={heroMediaRef}>
-          <img src="/assets/blogs/blog-1.webp" alt="Events" className="blog-hero-image" />
+          <Image
+            src="/assets/blogs/blog-1.webp"
+            alt="Events"
+            fill
+            sizes="100vw"
+            className="blog-hero-image"
+            priority
+          />
         </div>
 
         <div className="blog-hero-overlay" />
@@ -260,11 +268,13 @@ export default function EventsPage() {
                       className="upcoming-events__media"
                       aria-label={`View ${title}`}
                     >
-                      <img
+                      <Image
                         src={imageSrc}
                         alt={title}
                         className="upcoming-events__image"
-                        loading="lazy"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 400px"
+                        unoptimized
                         onError={(event) => {
                           const img = event.currentTarget;
 

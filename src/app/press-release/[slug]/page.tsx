@@ -184,7 +184,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, User } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import {
@@ -220,6 +220,20 @@ function getRoleMeta(role = '') {
     .split('|')
     .map((item) => item.trim())
     .filter(Boolean);
+
+  if (parts.length === 1) {
+    const dateMatch = parts[0]?.match(
+      /(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}/i,
+    );
+    if (dateMatch?.[0]) {
+      const date = dateMatch[0];
+      const author = (parts[0] ?? '')
+        .replace(date, '')
+        .replace(/[-–—,]\s*$/, '')
+        .trim();
+      return { author: author || 'CIO Dialogues Team', date };
+    }
+  }
 
   return {
     author: parts[0] || 'CIO Dialogues Team',
@@ -298,7 +312,7 @@ export default function PressReleaseDetailPage() {
     return (
       <main className="cio-detail-page">
         <div className="cio-detail-container">
-          <div className="cio-detail-loading">Loading post...</div>
+          <div className="cio-detail-loading">Loading...</div>
         </div>
       </main>
     );
@@ -338,14 +352,40 @@ export default function PressReleaseDetailPage() {
               <h1>{post.title}</h1>
 
               <div className="cio-detail-meta">
-                <span>
-                  <User size={15} />
+                <span className="cio-detail-meta-author">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="34"
+                    height="34"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20a8 8 0 0 1 16 0" />
+                  </svg>
                   {post.author}
                 </span>
 
                 {post.date ? (
-                  <span>
-                    <Calendar size={15} />
+                  <span className="cio-detail-meta-date">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="17"
+                      height="17"
+                      fill="none"
+                      stroke="#8e0101"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="5" width="18" height="16" rx="2" />
+                      <path d="M16 3v4M8 3v4M3 10h18" />
+                    </svg>
                     {post.date}
                   </span>
                 ) : null}
