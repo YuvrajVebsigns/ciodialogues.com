@@ -283,7 +283,7 @@ export default function BlogPage() {
       <section className="blog-hero">
         <div className="blog-hero-media" ref={heroMediaRef}>
           <Image
-            src="/assets/blogs/blog-1.webp"
+            src="/assets/blogs/new-banner2.png"
             alt="Read Blog"
             fill
             priority
@@ -294,7 +294,7 @@ export default function BlogPage() {
         <div className="blog-hero-overlay"></div>
 
         <div className="blog-hero-content" ref={heroContentRef}>
-          <h1>Explore Insights</h1>
+          {/* <h1>Explore Insights</h1> */}
 
           <div className="blog-breadcrumb">
             <Link href="/" className="blog-breadcrumb-home">

@@ -145,7 +145,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="registration-form">
             <label className="registration-label">
-              Name*
+              <span className="registration-field-label">Name*</span>
               <input
                 type="text"
                 placeholder="Full name"
@@ -170,7 +170,7 @@ export default function RegisterPage() {
             </label>
 
             <label className="registration-label">
-              Email*
+              <span className="registration-field-label">Email*</span>
               <input
                 type="email"
                 placeholder="your@company.com"
@@ -192,7 +192,7 @@ export default function RegisterPage() {
             </label>
 
             <label className="registration-label" htmlFor="registration-country-code">
-              Country Code*
+              <span className="registration-field-label">Country Code*</span>
               <CountryCodeSelect
                 id="registration-country-code"
                 value={country}
@@ -212,11 +212,11 @@ export default function RegisterPage() {
             </label>
 
             <label className="registration-label">
-              Phone Number*
+              <span className="registration-field-label">Phone Number*</span>
               <input
                 type="tel"
                 name="phoneNumber"
-                placeholder="9876543210"
+                placeholder="9XXXXXXXX0"
                 value={phone}
                 inputMode="numeric"
                 maxLength={10}
@@ -240,7 +240,7 @@ export default function RegisterPage() {
             </label>
 
             <label className="registration-label">
-              Organization*
+              <span className="registration-field-label">Organization*</span>
               <input
                 type="text"
                 placeholder="Company name"
@@ -263,7 +263,7 @@ export default function RegisterPage() {
             </label>
 
             <label className="registration-label">
-              Select Event*
+              <span className="registration-field-label">Select Event*</span>
               <select
                 value={selectedEvent}
                 onChange={(e) => {

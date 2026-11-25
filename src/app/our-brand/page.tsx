@@ -530,6 +530,14 @@ function cleanText(text: string, limit = 230) {
   return value.length > limit ? `${value.slice(0, limit)}...` : value;
 }
 
+function cleanCardExcerpt(text: string) {
+  const withoutLinks = text
+    .replace(/(?:^|\s)\d+\.\s*(?=(?:https?:\/\/|www\.))/gi, ' ')
+    .replace(/(?:https?:\/\/|www\.)[^\s<>"']+/gi, ' ');
+
+  return cleanText(withoutLinks, 160);
+}
+
 function generateSlug(text: string): string {
   return text
     .toLowerCase()
@@ -579,7 +587,7 @@ function mapTestimonialsToPosts(testimonials: PageTestimonial[]): OurBrandPost[]
         author: meta.author,
         date: meta.date,
         image: isValidImageUrl(item.avatar) ? item.avatar!.trim() : fallbackImage,
-        excerpt: cleanText(description),
+        excerpt: cleanCardExcerpt(description),
         content: description,
         slug: generateSlug(title),
         category: meta.category,
@@ -626,7 +634,7 @@ export default function OurBrandPage() {
   const latestPosts = posts.slice(3);
 
   return (
-    <main className="news-editorial-page">
+    <main className="news-editorial-page our-brand-page">
       {isLoading ? (
         <section className="news-editorial-status">
           <h2>Loading stories...</h2>

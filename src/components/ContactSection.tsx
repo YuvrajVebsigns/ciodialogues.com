@@ -219,7 +219,7 @@ const SERVICE_OPTIONS = [
 ];
 
 const TURNSTILE_SCRIPT_SRC =
-  'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&language=en';
+  'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
 declare global {
   interface Window {
@@ -228,8 +228,10 @@ declare global {
         element: HTMLElement,
         options: {
           sitekey: string;
+          language?: string;
           theme?: 'light' | 'dark' | 'auto';
-          size?: 'normal' | 'compact' | 'flexible' | 'invisible';
+          size?: 'normal' | 'compact' | 'flexible';
+          appearance?: 'always' | 'execute' | 'interaction-only';
           execution?: 'render' | 'execute';
           callback?: (token: string) => void;
           'expired-callback'?: () => void;
@@ -351,11 +353,14 @@ export default function ContactSection() {
           sitekey: turnstileSiteKey,
 
           /*
-           * Invisible mode keeps the Cloudflare widget hidden.
-           * The custom security card provides the visible status.
+           * The managed widget stays hidden unless Cloudflare needs
+           * the visitor to interact with the challenge.
            */
-          size: 'invisible',
+          size: 'flexible',
+          appearance: 'interaction-only',
           execution: 'execute',
+
+          language: 'en',
 
           theme: 'light',
 
@@ -412,10 +417,10 @@ export default function ContactSection() {
 
             if (errorCode === '110200') {
               setPopupMessage(
-                'Security verification could not be completed. Please refresh and try again.',
+                'CAPTCHA verification is unavailable for this domain. Please contact support.',
               );
             } else {
-              setPopupMessage('Security verification failed. Please try again.');
+              setPopupMessage('Captcha verification failed. Please try again.');
             }
           },
 
@@ -1012,7 +1017,7 @@ export default function ContactSection() {
                     {captchaStatus === 'verified'
                       ? 'You can now submit the form.'
                       : captchaStatus === 'verifying'
-                        ? 'Confirming that this request is legitimate.'
+                        ? 'Please wait while we verify your submission.'
                         : captchaStatus === 'error'
                           ? 'Please try again.'
                           : !isFormComplete
@@ -1069,10 +1074,10 @@ export default function ContactSection() {
               </div>
 
               {/* =================================================
-                  INVISIBLE TURNSTILE
+                TURNSTILE WIDGET
               ================================================== */}
 
-              <div ref={turnstileContainerRef} className="turnstile-invisible" aria-hidden="true" />
+              <div ref={turnstileContainerRef} className="turnstile-widget" />
             </div>
             <br />
 

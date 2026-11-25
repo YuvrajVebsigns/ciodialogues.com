@@ -192,6 +192,8 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import type { ReactNode } from 'react';
+import styles from './page.module.css';
 
 import {
   fetchWebsitePageBySlug,
@@ -275,47 +277,43 @@ function testimonialToPost(item: PageTestimonial): PostDetail {
   };
 }
 
-function extractExternalCompanyLink(content: string): {
-  content: string;
-  link: string;
-} {
-  const normalizedContent = content.replace(/&amp;/gi, '&');
+function renderParagraphWithLinks(paragraph: string): ReactNode[] {
+  const normalizedContent = paragraph.replace(/&amp;/gi, '&');
   const urlPattern = /(?:https?:\/\/|www\.)[^\s<>"']+/gi;
-  let companyLink = '';
-  let cleanedContent = normalizedContent;
+  const nodes: ReactNode[] = [];
+  let lastIndex = 0;
 
-  for (const match of normalizedContent.matchAll(urlPattern)) {
+  for (const [index, match] of Array.from(normalizedContent.matchAll(urlPattern)).entries()) {
     const rawUrl = match[0] ?? '';
     const urlValue = rawUrl.replace(/[.,;:!?)}\]]+$/, '');
     const normalizedUrl = /^www\./i.test(urlValue) ? `https://${urlValue}` : urlValue;
+    const startIndex = match.index ?? 0;
+
+    nodes.push(normalizedContent.slice(lastIndex, startIndex));
 
     try {
       const url = new URL(normalizedUrl);
-      const hostname = url.hostname.toLowerCase();
-
-      const isCompanyWebsite =
-        !hostname.includes('youtube.') &&
-        !hostname.includes('youtu.be') &&
-        !/\.(?:avif|bmp|gif|jpe?g|png|svg|webp)$/i.test(url.pathname);
-
-      if (isCompanyWebsite) {
-        companyLink = url.href;
-        cleanedContent = cleanedContent.replace(rawUrl, '').replace(urlValue, '').trim();
-        break;
-      }
+      nodes.push(
+        <a
+          key={`content-link-${index}`}
+          className={styles.externalLink}
+          href={url.href}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {urlValue}
+        </a>,
+      );
     } catch {
-      // Ignore malformed URL values.
+      nodes.push(urlValue);
     }
+
+    nodes.push(rawUrl.slice(urlValue.length));
+    lastIndex = startIndex + rawUrl.length;
   }
 
-  return {
-    content: cleanedContent
-      .replace(/[ \t]+/g, ' ')
-      .replace(/\s*\n\s*/g, '\n')
-      .replace(/\n{3,}/g, '\n\n')
-      .trim(),
-    link: companyLink,
-  };
+  nodes.push(normalizedContent.slice(lastIndex));
+  return nodes;
 }
 
 export default function ThoughtLeadershipDetailPage() {
@@ -326,7 +324,6 @@ export default function ThoughtLeadershipDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [imageSrc, setImageSrc] = useState(fallbackImage);
-  const { content, link } = extractExternalCompanyLink(post?.content || '');
   useEffect(() => {
     setImageSrc(post?.image || fallbackImage);
   }, [post]);
@@ -470,21 +467,12 @@ export default function ThoughtLeadershipDetailPage() {
           </div>
 
           <div className="cio-detail-content">
-            {content
+            {post.content
               .split('\n\n')
               .filter((paragraph) => paragraph.trim())
               .map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
+                <p key={index}>{renderParagraphWithLinks(paragraph)}</p>
               ))}
-
-            {link ? (
-              <div className="cio-detail-company-link">
-                <a href={link} target="_blank" rel="noopener noreferrer">
-                  Click Here
-                  <span aria-hidden="true">→</span>
-                </a>
-              </div>
-            ) : null}
           </div>
         </article>
       </div>

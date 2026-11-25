@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
 import { ArrowUpLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { FaFacebookF, FaInstagram, FaLink, FaWhatsapp, FaXTwitter } from 'react-icons/fa6';
 import ClientErrorBoundary from '@/components/ClientErrorBoundary';
 import EventDetailsAnimated from '@/components/EventDetailsAnimated';
 import EventSponsorsSection from '@/components/EventSponsorsSection';
@@ -198,6 +199,14 @@ export default function EventDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showShareOptions, setShowShareOptions] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!shareFeedback) return;
+
+    const timer = window.setTimeout(() => setShareFeedback(null), 2400);
+    return () => window.clearTimeout(timer);
+  }, [shareFeedback]);
 
   function extractTextFromContent(content: unknown): string {
     if (!content) return '';
@@ -333,13 +342,11 @@ export default function EventDetailsPage() {
   async function copyLinkToClipboard() {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      // Small UX feedback could be added here (toast), kept minimal per request
-    } catch (_) {
-      // ignore
+      setShareFeedback('Link copied');
+    } catch {
+      setShareFeedback('Unable to copy link');
     }
   }
-
-  // Inline icon components removed (not used) to satisfy linter
 
   if (isLoading) {
     return (
@@ -579,11 +586,14 @@ export default function EventDetailsPage() {
             </div>
 
             <div style={{ marginTop: 24 }}>
-              <div className="share-container">
+              <div className="share-container event-share-container">
                 <button
                   type="button"
                   className="talk-btn"
-                  onClick={() => setShowShareOptions((s) => !s)}
+                  onClick={() => {
+                    setShowShareOptions((s) => !s);
+                    setShareFeedback(null);
+                  }}
                   aria-expanded={showShareOptions}
                   aria-haspopup="menu"
                   id="share-button"
@@ -597,46 +607,72 @@ export default function EventDetailsPage() {
                 <br />
 
                 {showShareOptions ? (
-                  <div className="share-popup" role="menu" aria-labelledby="share-button">
+                  <div
+                    className="share-popup social-share-popup"
+                    role="menu"
+                    aria-labelledby="share-button"
+                  >
                     <button
                       type="button"
                       onClick={handleShareWhatsApp}
-                      className="share-option whatsapp"
+                      className="share-option whatsapp social-share-option"
+                      role="menuitem"
+                      aria-label="Share on WhatsApp"
+                      title="Share on WhatsApp"
                     >
-                      <span>WhatsApp</span>
+                      <FaWhatsapp aria-hidden="true" focusable="false" />
                     </button>
 
                     <button
                       type="button"
                       onClick={handleShareFacebook}
-                      className="share-option facebook"
+                      className="share-option facebook social-share-option"
+                      role="menuitem"
+                      aria-label="Share on Facebook"
+                      title="Share on Facebook"
                     >
-                      <span>Facebook</span>
+                      <FaFacebookF aria-hidden="true" focusable="false" />
                     </button>
 
                     <button
                       type="button"
                       onClick={handleShareTwitter}
-                      className="share-option twitter"
+                      className="share-option twitter social-share-option"
+                      role="menuitem"
+                      aria-label="Share on X"
+                      title="Share on X"
                     >
-                      <span>Twitter</span>
+                      <FaXTwitter aria-hidden="true" focusable="false" />
                     </button>
 
                     <button
                       type="button"
                       onClick={handleShareInstagram}
-                      className="share-option instagram"
+                      className="share-option instagram social-share-option"
+                      role="menuitem"
+                      aria-label="Share on Instagram"
+                      title="Share on Instagram"
                     >
-                      <span>Instagram</span>
+                      <FaInstagram aria-hidden="true" focusable="false" />
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={copyLinkToClipboard}
-                      className="share-option copy"
-                    >
-                      <span>Copy Link</span>
-                    </button>
+                    <span className="social-share-copy-wrapper" role="none">
+                      <button
+                        type="button"
+                        onClick={copyLinkToClipboard}
+                        className="share-option copy social-share-option"
+                        role="menuitem"
+                        aria-label="Copy event link"
+                        title="Copy event link"
+                      >
+                        <FaLink aria-hidden="true" focusable="false" />
+                      </button>
+                      {shareFeedback ? (
+                        <span className="social-share-feedback" role="status" aria-live="polite">
+                          {shareFeedback}
+                        </span>
+                      ) : null}
+                    </span>
                   </div>
                 ) : null}
               </div>

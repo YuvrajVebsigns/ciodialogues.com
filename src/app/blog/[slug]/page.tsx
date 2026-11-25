@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowUpLeft, ArrowUpRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { FaFacebookF, FaInstagram, FaLink, FaWhatsapp, FaXTwitter } from 'react-icons/fa6';
 import useScrollAnimation from '../../../hooks/useScrollAnimation';
 import BlogCommentsPanel from '@/components/BlogCommentsPanel';
 import { extractImageUrl } from '@/lib/image-url';
@@ -162,8 +163,16 @@ export default function BlogDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showShareOptions, setShowShareOptions] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState<string | null>(null);
 
   const [imageSrc, setImageSrc] = useState('/assets/blogs/blog-1.webp');
+
+  useEffect(() => {
+    if (!shareFeedback) return;
+
+    const timer = window.setTimeout(() => setShareFeedback(null), 2400);
+    return () => window.clearTimeout(timer);
+  }, [shareFeedback]);
 
   useEffect(() => {
     let isMounted = true;
@@ -280,14 +289,12 @@ export default function BlogDetailsPage() {
     setShowShareOptions(false);
   }
 
-  // minimal helpers kept; unused icon components removed to satisfy linter
-
   async function copyLinkToClipboard() {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      // Small UX feedback could be added here (toast), kept minimal per request
-    } catch (_) {
-      // ignore
+      setShareFeedback('Link copied');
+    } catch {
+      setShareFeedback('Unable to copy link');
     }
   }
 
@@ -357,14 +364,17 @@ export default function BlogDetailsPage() {
                 animationClass="animate-fade-in"
                 initialTransform="translateY(18px)"
               >
-                <div className="share-container">
+                <div className="share-container blog-share-container">
                   <button
                     type="button"
                     className="talk-btn"
-                    onClick={() => setShowShareOptions((s) => !s)}
+                    onClick={() => {
+                      setShowShareOptions((s) => !s);
+                      setShareFeedback(null);
+                    }}
                     aria-expanded={showShareOptions}
                     aria-haspopup="menu"
-                    id="share-button"
+                    id="blog-share-button"
                   >
                     <span>Share Blog</span>
                     <div className="talk-btn-icon">
@@ -373,61 +383,72 @@ export default function BlogDetailsPage() {
                   </button>
 
                   {showShareOptions ? (
-                    <div className="share-popup" role="menu" aria-labelledby="share-button">
+                    <div
+                      className="share-popup blog-share-popup social-share-popup"
+                      role="menu"
+                      aria-labelledby="blog-share-button"
+                    >
                       <button
                         type="button"
                         onClick={handleShareWhatsApp}
-                        className="share-option whatsapp"
+                        className="share-option whatsapp social-share-option"
+                        role="menuitem"
+                        aria-label="Share on WhatsApp"
+                        title="Share on WhatsApp"
                       >
-                        {/* <span style={{ display: 'inline-flex', marginRight: 8 }}>
-                        <WhatsAppIcon />
-                      </span> */}
-                        <span>WhatsApp</span>
+                        <FaWhatsapp aria-hidden="true" focusable="false" />
                       </button>
 
                       <button
                         type="button"
                         onClick={handleShareFacebook}
-                        className="share-option facebook"
+                        className="share-option facebook social-share-option"
+                        role="menuitem"
+                        aria-label="Share on Facebook"
+                        title="Share on Facebook"
                       >
-                        {/* <span style={{ display: 'inline-flex', marginRight: 8 }}>
-                        <FacebookIcon />
-                      </span> */}
-                        <span>Facebook</span>
+                        <FaFacebookF aria-hidden="true" focusable="false" />
                       </button>
 
                       <button
                         type="button"
                         onClick={handleShareTwitter}
-                        className="share-option twitter"
+                        className="share-option twitter social-share-option"
+                        role="menuitem"
+                        aria-label="Share on X"
+                        title="Share on X"
                       >
-                        {/* <span style={{ display: 'inline-flex', marginRight: 8 }}>
-                        <TwitterIcon />
-                      </span> */}
-                        <span>Twitter</span>
+                        <FaXTwitter aria-hidden="true" focusable="false" />
                       </button>
 
                       <button
                         type="button"
                         onClick={handleShareInstagram}
-                        className="share-option instagram"
+                        className="share-option instagram social-share-option"
+                        role="menuitem"
+                        aria-label="Share on Instagram"
+                        title="Share on Instagram"
                       >
-                        {/* <span style={{ display: 'inline-flex', marginRight: 8 }}>
-                        <InstagramIcon />
-                      </span> */}
-                        <span>Instagram</span>
+                        <FaInstagram aria-hidden="true" focusable="false" />
                       </button>
 
-                      <button
-                        type="button"
-                        onClick={copyLinkToClipboard}
-                        className="share-option copy"
-                      >
-                        {/* <span style={{ display: 'inline-flex', marginRight: 8 }}>
-                        <LinkIcon />
-                      </span> */}
-                        <span>Copy Link</span>
-                      </button>
+                      <span className="social-share-copy-wrapper" role="none">
+                        <button
+                          type="button"
+                          onClick={copyLinkToClipboard}
+                          className="share-option copy social-share-option"
+                          role="menuitem"
+                          aria-label="Copy blog link"
+                          title="Copy blog link"
+                        >
+                          <FaLink aria-hidden="true" focusable="false" />
+                        </button>
+                        {shareFeedback ? (
+                          <span className="social-share-feedback" role="status" aria-live="polite">
+                            {shareFeedback}
+                          </span>
+                        ) : null}
+                      </span>
                     </div>
                   ) : null}
                 </div>

@@ -306,7 +306,9 @@ function extractContentImages(content: string) {
   return {
     content: cleanedContent
       .replace(/[ \t]+/g, ' ')
-      .replace(/\s*\n\s*/g, '\n')
+      .replace(/\r\n?/g, '\n')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n[ \t]+/g, '\n')
       .replace(/\n{3,}/g, '\n\n')
       .trim(),
     images,
@@ -649,7 +651,7 @@ export default function TechnologyDetailPage() {
             </div>
           </div>
 
-          <div className="cio-detail-content">
+          <div className="cio-detail-content technology-detail-content">
             {post.content
               .split(/\n\s*\n/)
               .filter((paragraph) => paragraph.trim())
