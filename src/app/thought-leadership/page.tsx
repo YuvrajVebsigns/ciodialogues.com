@@ -64,25 +64,6 @@ const leftColumnStories = [
   },
 ];
 
-const popularStories = [
-  {
-    title: 'Building a leadership culture prepared for intelligent transformation',
-    image: '/assets/blogs/blog-1.webp',
-  },
-  {
-    title: 'Why strategic technology decisions now require board-level participation',
-    image: '/assets/blogs/blog-3.webp',
-  },
-  {
-    title: 'Enterprise leaders rethink cloud, data, and artificial intelligence priorities',
-    image: '/assets/blogs/blog-3.webp',
-  },
-  {
-    title: 'Digital leadership moves from transformation projects to continuous change',
-    image: '/assets/blogs/blog-1.webp',
-  },
-];
-
 function generateSlug(text: string) {
   return text
     .toLowerCase()
@@ -430,22 +411,38 @@ export default function ThoughtLeadershipPage() {
               </div>
 
               <div className="news-editorial-popular-list">
-                {popularStories.map((story, index) => (
-                  <article key={story.title} className="news-editorial-popular-story">
+                {posts.slice(-4).map((post, index) => (
+                  <article key={post.id} className="news-editorial-popular-story">
                     <div className="news-editorial-popular-image">
-                      <Image src={story.image} alt={story.title} fill sizes="72px" unoptimized />
+                      <Link href={`/thought-leadership/${post.slug}`}>
+                        <Image
+                          src={getImageSrc(post.id, post.image)}
+                          alt={post.title}
+                          fill
+                          sizes="72px"
+                          unoptimized
+                          onError={() =>
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [post.id]: true,
+                            }))
+                          }
+                        />
+                      </Link>
                     </div>
 
                     <div>
                       <span>{String(index + 1).padStart(2, '0')}</span>
 
-                      <h3>{story.title}</h3>
+                      <Link href={`/thought-leadership/${post.slug}`}>
+                        <h3>{post.title}</h3>
+                      </Link>
                     </div>
                   </article>
                 ))}
               </div>
             </section>
-
+            <br />
             <section className="news-editorial-sidebar-links">
               <div className="news-editorial-section-heading">
                 <span />

@@ -17560,7 +17560,8 @@ s .dialogues-badge-mark {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 22px;
-  align-items: start;
+  grid-auto-rows: 1fr;
+  align-items: stretch;
 }
 
 .news-editorial-latest-card {
@@ -17652,6 +17653,11 @@ s .dialogues-badge-mark {
 }
 
 .news-editorial-latest-card h3 {
+  display: -webkit-box;
+  min-height: 3.6em;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
   order: 2;
   margin: 0 0 9px;
   color: #090909;
@@ -17666,33 +17672,17 @@ s .dialogues-badge-mark {
 }
 
 .news-editorial-latest-card p {
+  display: -webkit-box;
+  min-height: 6.2em;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
   order: 3;
   margin: 0;
   color: #444;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   line-height: 1.55;
-}
-
-.our-brand-page .news-editorial-latest-grid {
-  grid-auto-rows: 1fr;
-  align-items: stretch;
-}
-
-.our-brand-page .news-editorial-latest-card h3 {
-  display: -webkit-box;
-  min-height: 3.6em;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-}
-
-.our-brand-page .news-editorial-latest-card p {
-  display: -webkit-box;
-  min-height: 6.2em;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
 }
 
 /* =========================================================

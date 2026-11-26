@@ -28,12 +28,6 @@ type EditorialStory = {
   href: string;
 };
 
-type PopularStory = {
-  title: string;
-  image: string;
-  href: string;
-};
-
 const fallbackImage = '/assets/blogs/blog-1.webp';
 
 const staticPosts: CIOTransitionPost[] = [];
@@ -56,29 +50,6 @@ const leftColumnStories: EditorialStory[] = [
     title: 'New technology leaders take charge across major organisations',
     author: 'EDITORIAL BUREAU',
     href: '/leader-transitions',
-  },
-];
-
-const popularStories: PopularStory[] = [
-  {
-    title: 'CIOs increase investments in generative artificial intelligence',
-    image: '/assets/blogs/blog-3.webp',
-    href: '/technology',
-  },
-  {
-    title: 'Data governance framework becomes an enterprise priority',
-    image: '/assets/blogs/blog-1.webp',
-    href: '/business-insights',
-  },
-  {
-    title: 'Technology leaders rethink cloud cost optimisation strategies',
-    image: '/assets/blogs/blog-3.webp',
-    href: '/technology',
-  },
-  {
-    title: 'Security teams prepare for a rapidly changing threat landscape',
-    image: '/assets/blogs/blog-1.webp',
-    href: '/technology',
   },
 ];
 
@@ -372,19 +343,19 @@ export default function CIOTransitionsPage() {
               </div>
 
               <div className="news-editorial-popular-list">
-                {popularStories.map((story, index) => (
+                {posts.slice(-4).map((post, index) => (
                   <Link
-                    href={story.href}
-                    key={story.title}
+                    href={`/cio-transitions/${post.slug}`}
+                    key={post.id}
                     className="news-editorial-popular-story"
                   >
                     <div className="news-editorial-popular-image">
-                      <Image src={story.image} alt={story.title} fill sizes="72px" unoptimized />
+                      <Image src={post.image} alt={post.title} fill sizes="72px" unoptimized />
                     </div>
 
                     <div>
                       <span>{String(index + 1).padStart(2, '0')}</span>
-                      <h3>{story.title}</h3>
+                      <h3>{post.title}</h3>
                     </div>
                   </Link>
                 ))}

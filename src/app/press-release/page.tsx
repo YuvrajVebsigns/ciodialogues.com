@@ -341,25 +341,6 @@ const leftColumnStories = [
   },
 ];
 
-const popularStories = [
-  {
-    title: 'Technology company announces expanded enterprise transformation partnership',
-    image: '/assets/blogs/blog-1.webp',
-  },
-  {
-    title: 'New leadership appointment strengthens digital and technology strategy',
-    image: '/assets/blogs/blog-3.webp',
-  },
-  {
-    title: 'Enterprise platform launch focuses on automation, data, and customer experience',
-    image: '/assets/blogs/blog-1.webp',
-  },
-  {
-    title: 'Strategic business milestone supports the next phase of regional expansion',
-    image: '/assets/blogs/blog-3.webp',
-  },
-];
-
 function cleanText(text: string, limit = 230) {
   const value = text.replace(/\s+/g, ' ').trim();
 
@@ -691,16 +672,32 @@ export default function PressReleasePage() {
               </div>
 
               <div className="news-editorial-popular-list">
-                {popularStories.map((story, index) => (
-                  <article key={story.title} className="news-editorial-popular-story">
+                {posts.slice(-4).map((post, index) => (
+                  <article key={post.id} className="news-editorial-popular-story">
                     <div className="news-editorial-popular-image">
-                      <Image src={story.image} alt={story.title} fill sizes="72px" unoptimized />
+                      <Link href={`/press-release/${post.slug}`}>
+                        <Image
+                          src={getImageSrc(post.id, post.image)}
+                          alt={post.title}
+                          fill
+                          sizes="72px"
+                          unoptimized
+                          onError={() =>
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [post.id]: true,
+                            }))
+                          }
+                        />
+                      </Link>
                     </div>
 
                     <div>
                       <span>{String(index + 1).padStart(2, '0')}</span>
 
-                      <h3>{story.title}</h3>
+                      <Link href={`/press-release/${post.slug}`}>
+                        <h3>{post.title}</h3>
+                      </Link>
                     </div>
                   </article>
                 ))}

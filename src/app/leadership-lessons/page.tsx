@@ -541,25 +541,6 @@ const leftColumnStories = [
   },
 ];
 
-const popularStories = [
-  {
-    title: 'How technology leaders build resilient teams during periods of disruption',
-    image: '/assets/blogs/blog-3.webp',
-  },
-  {
-    title: 'Executive decision-making evolves for the intelligent enterprise',
-    image: '/assets/blogs/blog-1.webp',
-  },
-  {
-    title: 'Leadership culture becomes central to successful digital transformation',
-    image: '/assets/blogs/blog-1.webp',
-  },
-  {
-    title: 'CIOs strengthen collaboration between technology and business teams',
-    image: '/assets/blogs/blog-1.webp',
-  },
-];
-
 function cleanText(text: string, limit = 230) {
   const value = text.replace(/\s+/g, ' ').trim();
 
@@ -898,15 +879,31 @@ export default function LeadershipLessonsPage() {
               </div>
 
               <div className="news-editorial-popular-list">
-                {popularStories.map((story, index) => (
-                  <article key={story.title} className="news-editorial-popular-story">
+                {posts.slice(-4).map((post, index) => (
+                  <article key={post.id} className="news-editorial-popular-story">
                     <div className="news-editorial-popular-image">
-                      <Image src={story.image} alt={story.title} fill sizes="72px" unoptimized />
+                      <Link href={`/leadership-lessons/${post.slug}`}>
+                        <Image
+                          src={getImageSrc(post.id, post.image)}
+                          alt={post.title}
+                          fill
+                          sizes="72px"
+                          unoptimized
+                          onError={() =>
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [post.id]: true,
+                            }))
+                          }
+                        />
+                      </Link>
                     </div>
 
                     <div>
                       <span>{String(index + 1).padStart(2, '0')}</span>
-                      <h3>{story.title}</h3>
+                      <Link href={`/leadership-lessons/${post.slug}`}>
+                        <h3>{post.title}</h3>
+                      </Link>
                     </div>
                   </article>
                 ))}

@@ -43,25 +43,6 @@ const leftColumnStories = [
   },
 ];
 
-const popularStories = [
-  {
-    title: 'CIOs increase investments in generative artificial intelligence',
-    image: '/assets/blogs/blog-1.webp',
-  },
-  {
-    title: 'Data governance framework becomes an enterprise priority',
-    image: '/assets/blogs/blog-3.webp',
-  },
-  {
-    title: 'Technology leaders rethink cloud cost optimisation strategies',
-    image: '/assets/blogs/blog-1.webp',
-  },
-  {
-    title: 'Security teams prepare for a rapidly changing threat landscape',
-    image: '/assets/blogs/blog-3.webp',
-  },
-];
-
 const sections = [
   { label: 'CIO VOICE', href: '/cio-voice' },
   { label: 'THOUGHT LEADERSHIP', href: '/thought-leadership' },
@@ -396,15 +377,31 @@ export default function CIOVoicePage() {
               </div>
 
               <div className="news-editorial-popular-list">
-                {popularStories.map((story, index) => (
-                  <article key={story.title} className="news-editorial-popular-story">
+                {posts.slice(-4).map((post, index) => (
+                  <article key={post.id} className="news-editorial-popular-story">
                     <div className="news-editorial-popular-image">
-                      <Image src={story.image} alt={story.title} fill sizes="72px" unoptimized />
+                      <Link href={`/cio-voice/${post.slug}`}>
+                        <Image
+                          src={getImageSrc(post.id, post.image)}
+                          alt={post.title}
+                          fill
+                          sizes="72px"
+                          unoptimized
+                          onError={() =>
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [post.id]: true,
+                            }))
+                          }
+                        />
+                      </Link>
                     </div>
 
                     <div>
                       <span>{String(index + 1).padStart(2, '0')}</span>
-                      <h3>{story.title}</h3>
+                      <Link href={`/cio-voice/${post.slug}`}>
+                        <h3>{post.title}</h3>
+                      </Link>
                     </div>
                   </article>
                 ))}

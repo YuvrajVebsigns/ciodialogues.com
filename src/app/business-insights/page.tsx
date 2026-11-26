@@ -348,25 +348,6 @@ const leftColumnStories = [
   },
 ];
 
-const popularStories = [
-  {
-    title: 'Enterprise leaders accelerate investments in intelligent automation',
-    image: '/assets/blogs/blog-3.webp',
-  },
-  {
-    title: 'Data strategy becomes a boardroom priority for modern businesses',
-    image: '/assets/blogs/blog-1.webp',
-  },
-  {
-    title: 'Digital-first growth models reshape customer experience',
-    image: '/assets/blogs/blog-1.webp',
-  },
-  {
-    title: 'Business transformation moves from projects to continuous change',
-    image: '/assets/blogs/blog-3.webp',
-  },
-];
-
 function cleanText(text: string, limit = 230) {
   const value = text.replace(/\s+/g, ' ').trim();
 
@@ -703,15 +684,31 @@ export default function BusinessInsightsPage() {
               </div>
 
               <div className="news-editorial-popular-list">
-                {popularStories.map((story, index) => (
-                  <article key={story.title} className="news-editorial-popular-story">
+                {posts.slice(-4).map((post, index) => (
+                  <article key={post.id} className="news-editorial-popular-story">
                     <div className="news-editorial-popular-image">
-                      <Image src={story.image} alt={story.title} fill sizes="72px" unoptimized />
+                      <Link href={`/business-insights/${post.slug}`}>
+                        <Image
+                          src={getImageSrc(post.id, post.image)}
+                          alt={post.title}
+                          fill
+                          sizes="72px"
+                          unoptimized
+                          onError={() =>
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [post.id]: true,
+                            }))
+                          }
+                        />
+                      </Link>
                     </div>
 
                     <div>
                       <span>{String(index + 1).padStart(2, '0')}</span>
-                      <h3>{story.title}</h3>
+                      <Link href={`/business-insights/${post.slug}`}>
+                        <h3>{post.title}</h3>
+                      </Link>
                     </div>
                   </article>
                 ))}

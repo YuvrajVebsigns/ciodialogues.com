@@ -619,25 +619,6 @@ const leftColumnStories = [
   },
 ];
 
-const popularStories = [
-  {
-    title: 'Agentic AI moves closer to mainstream enterprise deployment',
-    image: '/assets/blogs/blog-3.webp',
-  },
-  {
-    title: 'Cloud modernisation becomes a boardroom technology priority',
-    image: '/assets/blogs/blog-3.webp',
-  },
-  {
-    title: 'Cybersecurity teams strengthen identity-first protection strategies',
-    image: '/assets/blogs/blog-1.webp',
-  },
-  {
-    title: 'Data platforms evolve to support real-time intelligence and automation',
-    image: '/assets/blogs/blog-1.webp',
-  },
-];
-
 function cleanText(text: string, limit = 230) {
   const value = text.replace(/\s+/g, ' ').trim();
 
@@ -966,15 +947,31 @@ export default function TechnologyPage() {
               </div>
 
               <div className="news-editorial-popular-list">
-                {popularStories.map((story, index) => (
-                  <article key={story.title} className="news-editorial-popular-story">
+                {posts.slice(-4).map((post, index) => (
+                  <article key={post.id} className="news-editorial-popular-story">
                     <div className="news-editorial-popular-image">
-                      <Image src={story.image} alt={story.title} fill sizes="72px" unoptimized />
+                      <Link href={`/technology/${post.slug}`}>
+                        <Image
+                          src={getImageSrc(post.id, post.image)}
+                          alt={post.title}
+                          fill
+                          sizes="72px"
+                          unoptimized
+                          onError={() =>
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [post.id]: true,
+                            }))
+                          }
+                        />
+                      </Link>
                     </div>
 
                     <div>
                       <span>{String(index + 1).padStart(2, '0')}</span>
-                      <h3>{story.title}</h3>
+                      <Link href={`/technology/${post.slug}`}>
+                        <h3>{post.title}</h3>
+                      </Link>
                     </div>
                   </article>
                 ))}

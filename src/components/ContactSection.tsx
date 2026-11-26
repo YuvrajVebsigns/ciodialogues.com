@@ -416,11 +416,9 @@ export default function ContactSection() {
             setIsRefreshingCaptcha(false);
 
             if (errorCode === '110200') {
-              setPopupMessage(
-                'CAPTCHA verification is unavailable for this domain. Please contact support.',
-              );
+              setPopupMessage('This domain is not authorized for verification.');
             } else {
-              setPopupMessage('Captcha verification failed. Please try again.');
+              setPopupMessage('Security verification could not be completed. Please try again.');
             }
           },
 
@@ -1009,7 +1007,7 @@ export default function ContactSection() {
                       : captchaStatus === 'verifying'
                         ? 'Verifying...'
                         : captchaStatus === 'error'
-                          ? 'Verification failed'
+                          ? 'Verification unavailable'
                           : 'Verify you are human'}
                   </strong>
 
@@ -1019,7 +1017,7 @@ export default function ContactSection() {
                       : captchaStatus === 'verifying'
                         ? 'Please wait while we verify your submission.'
                         : captchaStatus === 'error'
-                          ? 'Please try again.'
+                          ? 'Please refresh the page or try again.'
                           : !isFormComplete
                             ? 'Complete all fields above first.'
                             : 'Click to complete the security check.'}
